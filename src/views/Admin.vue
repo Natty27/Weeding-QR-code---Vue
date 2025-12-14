@@ -77,18 +77,19 @@
     </transition-group>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "../services/api";
 import QRCode from "qrcode";
+
+// 🔥 CONFIG (CHANGE ONLY HERE IF IP CHANGES)
+const BACKEND_BASE_URL = "http://196.190.251.148:1234";
 
 const isCreating = ref(false);
 const isLoading = ref(false);
 
 const name = ref("");
 const guests = ref([]);
-
 const bulkCount = ref(3000);
 
 const bulkGenerate = async () => {
@@ -117,44 +118,39 @@ const load = async () => {
   isLoading.value = false;
 };
 
+// ✅ ZIP DOWNLOAD (BACKEND)
 const downloadZip = () => {
-  window.location.href =
-    "http://http://196.190.251.148:1234/guests/download/zip";
+  window.location.href = `${BACKEND_BASE_URL}/guests/download/zip`;
 };
 
+// ❌ Optional legacy individual download
 const downloadAll = async () => {
   for (let i = 0; i < guests.value.length; i++) {
     const g = guests.value[i];
 
     const dataUrl = await QRCode.toDataURL(
-      `http://http://196.190.251.148:4321/verify/${g.token}`,
-      {
-        width: 500,
-        margin: 2,
-        color: {
-          dark: "#8b5e3c",
-          light: "#ffffff",
-        },
-      }
+      `${BACKEND_BASE_URL}/guests/verify/${g.token}`,
+      { width: 500, margin: 2 }
     );
 
     const link = document.createElement("a");
     const number = String(g.sequence || i + 1).padStart(3, "0");
-
     link.href = dataUrl;
     link.download = `${number}.png`;
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    // small delay to avoid browser blocking
     await new Promise((r) => setTimeout(r, 80));
   }
 };
 
+// 🔥 QR POINTS DIRECTLY TO BACKEND
 const drawQR = (canvas, token) => {
   if (!canvas) return;
-  QRCode.toCanvas(canvas, `http://196.190.251.148:4321/verify/${token}`, {
+
+  QRCode.toCanvas(canvas, `${BACKEND_BASE_URL}/guests/verify/${token}`, {
     width: 160,
     margin: 1,
     color: {
