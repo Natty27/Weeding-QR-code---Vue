@@ -106,12 +106,20 @@ const downloadAll = async () => {
     const g = commons.value[i];
 
     const dataUrl = await QRCode.toDataURL(
-      `${BACKEND_BASE_URL}/common/verify/${g.token}`,
-      { width: 500, margin: 2 }
+      `http://196.190.251.148:4321/${g.name}`,
+      {
+        width: 500,
+        margin: 2,
+        color: {
+          dark: COLORS.gold, // QR dots
+          light: COLORS.soft, // background
+        },
+      }
     );
 
     const link = document.createElement("a");
     const number = String(g.sequence || i + 1).padStart(3, "0");
+
     link.href = dataUrl;
     link.download = `${number}.png`;
 
