@@ -100,6 +100,13 @@ const downloadZip = () => {
   window.location.href = `${BACKEND_BASE_URL}/common/download/zip`;
 };
 
+const COLORS = {
+  gold: "#c9a24d",
+  soft: "#fffaf8",
+  rose: "#f7c6d0",
+  dark: "#3b2f2f",
+};
+
 // ❌ Optional legacy individual download
 const downloadAll = async () => {
   for (let i = 0; i < commons.value.length; i++) {
