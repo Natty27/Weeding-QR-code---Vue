@@ -41,7 +41,6 @@
 <script setup>
 import weddingImage from "@/assets/weeding.jpg";
 import mapsIcon from "@/assets/Google_Maps_icon_(2020).svg";
-import pattern from "@/assets/pattern.svg";
 
 const openMap = () => {
   window.open(
