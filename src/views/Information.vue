@@ -1,27 +1,36 @@
 <template>
   <div class="page">
     <div class="card">
-      <!-- TEXT -->
+      <!-- LEFT CONTENT -->
       <div class="content">
-        <h1 class="title">Alexandra <span>&</span> Daniel</h1>
+        <h1 class="title">Bruk <span>&</span> Tsion</h1>
 
-        <hr style="background-color: blueviolet" />
+        <!-- LINE 1 -->
+        <div class="line"></div>
 
         <p class="subtitle">
           We warmly invite you to celebrate<br />
           our wedding day.
         </p>
 
+        <!-- LINE 2 -->
+        <div class="line"></div>
+
         <div class="details">
-          <p><strong>Date</strong> | July 12, 2025</p>
+          <p><strong>Date</strong> | January 12, 2026</p>
           <p><strong>Time</strong> | 4:00 PM</p>
-          <p><strong>Location</strong> | Rosewood Gardens, Springfield</p>
+          <p><strong>Location</strong> | Martyrs' Memorial Monument, Mekelle</p>
         </div>
 
-        <button class="map-btn">View on map</button>
+        <div class="actions">
+          <button class="map-btn" @click="openMap">View on map</button>
+          <span class="map-icon">
+            <img @click="openMap" :src="mapsIcon" alt="Map Icon" />
+          </span>
+        </div>
       </div>
 
-      <!-- IMAGE -->
+      <!-- RIGHT IMAGE -->
       <div class="image-wrapper">
         <img :src="weddingImage" alt="Wedding Couple" />
       </div>
@@ -30,133 +39,169 @@
 </template>
 
 <script setup>
-import weddingImage from "./../assets/wedding.jpg";
+import weddingImage from "../assets/weeding.jpg";
+import mapsIcon from "../assets/Google_Maps_icon_(2020).svg";
+import pattern from "../assets/pattern.svg";
+
+const openMap = () => {
+  window.open(
+    "https://www.google.com/maps/place/%E1%88%93%E1%8B%88%E1%88%8D%E1%89%B2+%E1%88%B0%E1%88%9B%E1%8A%A5%E1%89%B3%E1%89%B5+%E1%88%98%E1%89%90%E1%88%88+%7C+Martyrs'+Memorial+Monument+MeKele/@13.4904418,39.4593472,116m/data=!3m1!1e3!4m6!3m5!1s0x166afd13e7764125:0x4666973fabc46cd7!8m2!3d13.4904554!4d39.4593215!16s%2Fg%2F11g5zz2mp6?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D",
+    "_blank"
+  );
+};
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-
-/* ===== Page ===== */
+/* ================= FONTS ================= */
+@font-face {
+  font-family: "LinotypeAperto";
+  src: url("../assets/Font/linotypeaperto-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("../assets/Font/Poppins-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+} /* ================= PAGE ================= */
 .page {
   min-height: 100vh;
-  background: #ffffff;
-  padding: 14px; /* small white margin */
+  padding: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Poppins", sans-serif;
-}
-
-/* ===== Card ===== */
+  box-sizing: border-box; /* Use imported SVG as background */
+  background-image: url(~@/assets/pattern.svg); /* if not using import in JS */ /* OR using the imported variable from script setup */ /* background-image: url(" + pattern + "); */
+  background-repeat: repeat; /* or no-repeat if it’s a single pattern */
+  background-size: auto; /* or cover / contain depending on your SVG */
+  background-position: center;
+} /* ================= CARD ================= */
 .card {
   width: 100%;
-  max-width: 1400px;
-  min-height: 85vh;
-  padding: 64px;
-  border-radius: 46px;
-
-  background: linear-gradient(135deg, #f6eedc 0%, #efe3cd 50%, #e8dac1 100%);
-
+  max-width: 1500px;
+  min-height: 780px;
+  padding: 80px 96px;
+  border-radius: 56px; /* Gradient: keep top warm, fade toward white at bottom only */
+  background: linear-gradient(
+    to bottom,
+    #f6eedc 0%,
+    /* top warm color */ #efe3cd 50%,
+    /* middle warm color */ rgba(255, 255, 255, 0.7) 100%
+      /* bottom fade to white */
+  );
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr; /* TEXT LEFT, IMAGE RIGHT */
-  gap: 48px;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 72px;
   box-sizing: border-box;
-}
-
-/* ===== Content ===== */
+} /* ================= CONTENT ================= */
 .content {
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
+  font-family: "Poppins", sans-serif;
+} /* ===== TITLE ===== */
 .title {
-  font-size: 56px;
-  font-weight: 600;
-  margin: 0 0 20px;
+  font-family: "LinotypeAperto", serif;
+  font-size: 60px;
+  font-weight: 700;
+  margin: 0;
+  color: #000;
 }
-
 .title span {
   color: #b59a63;
-  margin: 0 6px;
-}
-
+  margin: 0 8px;
+} /* ===== LINES ===== */
+.line {
+  width: 380px; /* matches image length */
+  height: 1px;
+  background: #d3b88a;
+  margin: 22px 0 30px;
+} /* ===== SUBTITLE ===== */
 .subtitle {
-  font-size: 18px;
-  line-height: 1.7;
-  margin-bottom: 28px;
-  color: #333;
+  font-size: 20px;
+  line-height: 1.6;
+  color: #000;
+} /* ===== DETAILS ===== */
+.details {
+  margin-top: 6px;
 }
-
 .details p {
-  margin: 8px 0;
-  font-size: 18px;
+  font-size: 20px;
+  margin: 10px 0;
 }
-
 .details strong {
   font-weight: 600;
+} /* ===== ACTIONS ===== */
+.actions {
+  margin-top: 42px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
-
-/* ===== Button ===== */
 .map-btn {
-  margin-top: 34px;
-  width: fit-content;
+  padding: 18px 56px;
+  border-radius: 999px;
+  border: none;
   background: #b59a63;
   color: #fff;
-  border: none;
-  padding: 16px 44px;
-  border-radius: 999px;
   font-size: 18px;
-  font-weight: 500;
+  font-family: "Poppins", sans-serif;
   cursor: pointer;
-}
-
-/* ===== Image ===== */
+} /* .map-icon { font-size: 22px; } */
+.map-icon img {
+  width: 32px; /* adjust as needed */
+  height: 32px;
+  display: inline-block;
+} /* ================= IMAGE ================= */
 .image-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .image-wrapper img {
-  width: 100%;
-  max-width: 420px;
-  border-radius: 34px;
+  max-height: 620px;
+  width: auto;
+  max-width: 100%;
+  border-radius: 36px;
   object-fit: cover;
-}
-
-/* ================================================= */
-/* =================== MOBILE ====================== */
-/* ================================================= */
+} /* ================= MOBILE ================= */
 @media (max-width: 900px) {
+  .page {
+    padding: 16px;
+  }
   .card {
     grid-template-columns: 1fr;
-    padding: 32px 26px;
-    min-height: auto;
+    padding: 40px 28px;
+    gap: 36px;
   }
-
-  /* 🔑 THIS IS THE IMPORTANT PART */
   .image-wrapper {
-    order: -1; /* image moves to TOP */
+    order: -1;
   }
-
+  .image-wrapper img {
+    max-height: 340px;
+  }
   .content {
-    text-align: center;
     align-items: center;
+    text-align: center;
   }
-
+  .line {
+    width: 220px;
+  }
   .title {
-    font-size: 28px;
+    font-size: 30px;
   }
-
   .subtitle,
   .details p {
-    font-size: 15px;
+    font-size: 16px;
   }
-
-  .image-wrapper img {
-    max-width: 320px;
-    margin-bottom: 22px;
+  .actions {
+    justify-content: center;
+  }
+}
+@media (max-width: 900px) {
+  .map-icon {
+    display: none;
   }
 }
 </style>
