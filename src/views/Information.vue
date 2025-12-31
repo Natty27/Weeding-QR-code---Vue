@@ -17,16 +17,16 @@
         <div class="line"></div>
 
         <div class="details">
-          <p><strong>Date</strong> | January 12, 2026</p>
-          <p><strong>Time</strong> | 4:00 PM</p>
-          <p><strong>Location</strong> | Martyrs' Memorial Monument, Mekelle</p>
+          <p><strong>ዕለት</strong> | ቀዳም ጥሪ 2 ፡ 2018 ዓ/ም</p>
+          <p><strong>ሰዓት</strong> | 10:00</p>
+          <p><strong>ቦታ</strong> | ሓወልቲ ሰማዕታት መቐለ</p>
         </div>
 
         <div class="actions">
-          <button class="map-btn" @click="openMap">View on map</button>
-          <span class="map-icon">
-            <img @click="openMap" :src="mapsIcon" alt="Map Icon" />
-          </span>
+          <button class="map-btn" @click="openMap">
+            <img :src="mapsIcon" alt="Map Icon" class="map-icon" />
+            View on map
+          </button>
         </div>
       </div>
 
@@ -63,43 +63,50 @@ const openMap = () => {
   src: url("../assets/Font/Poppins-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
-} /* ================= PAGE ================= */
+}
+
+/* ================= PAGE ================= */
 .page {
   min-height: 100vh;
   padding: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box; /* Use imported SVG as background */
-  background-image: url(~@/assets/pattern.svg); /* if not using import in JS */ /* OR using the imported variable from script setup */ /* background-image: url(" + pattern + "); */
-  background-repeat: repeat; /* or no-repeat if it’s a single pattern */
-  background-size: auto; /* or cover / contain depending on your SVG */
+  box-sizing: border-box;
+  background-image: url(~@/assets/pattern.svg);
+  background-repeat: repeat;
+  background-size: auto;
   background-position: center;
-} /* ================= CARD ================= */
+}
+
+/* ================= CARD ================= */
 .card {
   width: 100%;
   max-width: 1500px;
   min-height: 780px;
   padding: 80px 96px;
-  border-radius: 56px; /* Gradient: keep top warm, fade toward white at bottom only */
+  border-radius: 56px;
   background: linear-gradient(
     to bottom,
     #f6eedc 0%,
-    /* top warm color */ #efe3cd 50%,
-    /* middle warm color */ rgba(255, 255, 255, 0.7) 100%
-      /* bottom fade to white */
+    #efe3cd 50%,
+    rgba(255, 255, 255, 0.7) 100%
   );
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 72px;
   box-sizing: border-box;
-} /* ================= CONTENT ================= */
+}
+
+/* ================= CONTENT ================= */
 .content {
   display: flex;
   flex-direction: column;
   justify-content: center;
   font-family: "Poppins", sans-serif;
-} /* ===== TITLE ===== */
+}
+
+/* ===== TITLE ===== */
 .title {
   font-family: "LinotypeAperto", serif;
   font-size: 60px;
@@ -110,18 +117,24 @@ const openMap = () => {
 .title span {
   color: #b59a63;
   margin: 0 8px;
-} /* ===== LINES ===== */
+}
+
+/* ===== LINES ===== */
 .line {
-  width: 380px; /* matches image length */
+  width: 380px;
   height: 1px;
   background: #d3b88a;
   margin: 22px 0 30px;
-} /* ===== SUBTITLE ===== */
+}
+
+/* ===== SUBTITLE ===== */
 .subtitle {
   font-size: 20px;
   line-height: 1.6;
   color: #000;
-} /* ===== DETAILS ===== */
+}
+
+/* ===== DETAILS ===== */
 .details {
   margin-top: 6px;
 }
@@ -131,13 +144,16 @@ const openMap = () => {
 }
 .details strong {
   font-weight: 600;
-} /* ===== ACTIONS ===== */
+}
+
+/* ===== ACTIONS ===== */
 .actions {
   margin-top: 42px;
   display: flex;
   align-items: center;
   gap: 16px;
 }
+
 .map-btn {
   padding: 18px 56px;
   border-radius: 999px;
@@ -147,12 +163,25 @@ const openMap = () => {
   font-size: 18px;
   font-family: "Poppins", sans-serif;
   cursor: pointer;
-} /* .map-icon { font-size: 22px; } */
-.map-icon img {
-  width: 32px; /* adjust as needed */
-  height: 32px;
-  display: inline-block;
-} /* ================= IMAGE ================= */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.map-btn:hover {
+  background: #a0895a;
+}
+
+.map-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  /* Removed the filter property to keep original colors */
+}
+
+/* ================= IMAGE ================= */
 .image-wrapper {
   display: flex;
   align-items: center;
@@ -164,7 +193,9 @@ const openMap = () => {
   max-width: 100%;
   border-radius: 36px;
   object-fit: cover;
-} /* ================= MOBILE ================= */
+}
+
+/* ================= MOBILE ================= */
 @media (max-width: 900px) {
   .page {
     padding: 16px;
@@ -197,10 +228,13 @@ const openMap = () => {
   .actions {
     justify-content: center;
   }
-}
-@media (max-width: 900px) {
+  .map-btn {
+    padding: 16px 40px;
+    font-size: 16px;
+  }
   .map-icon {
-    display: none;
+    width: 20px;
+    height: 20px;
   }
 }
 </style>
