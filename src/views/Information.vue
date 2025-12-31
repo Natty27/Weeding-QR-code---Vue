@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import weddingImage from "@/assets/weeding.jpg";
+import weddingImage from "@/assets/weeding.jpeg";
 import mapsIcon from "@/assets/Google_Maps_icon_(2020).svg";
 
 const openMap = () => {
