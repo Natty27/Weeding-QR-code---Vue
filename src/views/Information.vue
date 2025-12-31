@@ -19,7 +19,7 @@
         <div class="details">
           <p><strong>ዕለት</strong> | ቀዳም ጥሪ 2 ፡ 2018 ዓ/ም</p>
           <p><strong>ሰዓት</strong> | 10:00</p>
-          <p><strong>ቦታ</strong> | ሓወልቲ ሰማዕታት መቐለ</p>
+          <p><strong>ቦታ</strong> | ሓወልቲ ሰማእታት መቐለ</p>
         </div>
 
         <div class="actions">
