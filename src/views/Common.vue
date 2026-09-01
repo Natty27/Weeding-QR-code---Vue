@@ -60,7 +60,7 @@ import api from "../services/api";
 import QRCode from "qrcode";
 
 // 🔥 CONFIG (CHANGE ONLY HERE IF IP CHANGES)
-const BACKEND_BASE_URL = "http://196.190.251.148:1234";
+const BACKEND_BASE_URL = "http://localhost:3000";
 
 const isCreating = ref(false);
 const isLoading = ref(false);

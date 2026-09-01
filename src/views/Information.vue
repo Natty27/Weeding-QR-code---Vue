@@ -3,238 +3,218 @@
     <div class="card">
       <!-- LEFT CONTENT -->
       <div class="content">
-        <h1 class="title">Bruk <span>&</span> Tsion</h1>
+        <div class="launch-badge">🚀 LAUNCH DAY ACCESS PASS</div>
+        <h1 class="title">Product <span>&</span> App Launch</h1>
 
-        <!-- LINE 1 -->
         <div class="line"></div>
 
         <p class="subtitle">
-          We warmly invite you to celebrate<br />
-          our wedding day.
+          Join us live for the official launch keynotes,<br />
+          live product demos, and VIP networking party.
         </p>
 
-        <!-- LINE 2 -->
         <div class="line"></div>
 
         <div class="details">
-          <p><strong>ዕለት</strong> | ቀዳም ጥሪ 2 ፡ 2018 ዓ/ም</p>
-          <p><strong>ሰዓት</strong> | 10:00</p>
-          <p><strong>ቦታ</strong> | ሓወልቲ ሰማእታት መቐለ</p>
+          <p><strong>Date</strong> | Saturday, Launch Day</p>
+          <p><strong>Time</strong> | 10:00 AM UTC</p>
+          <p><strong>Venue</strong> | Innovation Center Main Hall</p>
         </div>
 
         <div class="actions">
           <button class="map-btn" @click="openMap">
             <img :src="mapsIcon" alt="Map Icon" class="map-icon" />
-            View on map
+            View Event Location
           </button>
         </div>
       </div>
 
-      <!-- RIGHT IMAGE -->
+      <!-- RIGHT IMAGE / BANNER -->
       <div class="image-wrapper">
-        <img :src="weddingImage" alt="Wedding Couple" />
+        <div class="tech-graphic">
+          <div class="glow-circle"></div>
+          <div class="launch-card-graphic">
+            <span class="pulse-icon">🚀</span>
+            <h3>NEXT GEN APP</h3>
+            <p>Official Launch Event Access</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import weddingImage from "@/assets/weeding.jpeg";
 import mapsIcon from "@/assets/Google_Maps_icon_(2020).svg";
 
 const openMap = () => {
   window.open(
-    "https://www.google.com/maps/place/%E1%88%93%E1%8B%88%E1%88%8D%E1%89%B2+%E1%88%B0%E1%88%9B%E1%8A%A5%E1%89%B3%E1%89%B5+%E1%88%98%E1%89%90%E1%88%88+%7C+Martyrs'+Memorial+Monument+MeKele/@13.4904418,39.4593472,116m/data=!3m1!1e3!4m6!3m5!1s0x166afd13e7764125:0x4666973fabc46cd7!8m2!3d13.4904554!4d39.4593215!16s%2Fg%2F11g5zz2mp6?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D",
+    "https://maps.google.com",
     "_blank"
   );
 };
 </script>
 
 <style scoped>
-/* ================= FONTS ================= */
-@font-face {
-  font-family: "LinotypeAperto";
-  src: url("../assets/Font/linotypeaperto-bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Poppins";
-  src: url("../assets/Font/Poppins-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-/* ================= PAGE ================= */
 .page {
   min-height: 100vh;
   padding: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  background-image: url(~@/assets/pattern.svg);
-  background-repeat: repeat;
-  background-size: auto;
-  background-position: center;
+  background: radial-gradient(circle at 50% 20%, #1E1B4B 0%, #090D16 80%);
 }
 
-/* ================= CARD ================= */
 .card {
   width: 100%;
-  max-width: 1500px;
-  min-height: 780px;
-  padding: 80px 96px;
-  border-radius: 56px;
-  background: linear-gradient(
-    to bottom,
-    #f6eedc 0%,
-    #efe3cd 50%,
-    rgba(255, 255, 255, 0.7) 100%
-  );
+  max-width: 1200px;
+  padding: 60px;
+  border-radius: 36px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: 72px;
-  box-sizing: border-box;
+  gap: 48px;
 }
 
-/* ================= CONTENT ================= */
 .content {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-family: "Poppins", sans-serif;
+  text-align: left;
 }
 
-/* ===== TITLE ===== */
-.title {
-  font-family: "LinotypeAperto", serif;
-  font-size: 60px;
+.launch-badge {
+  display: inline-block;
+  font-size: 12px;
   font-weight: 700;
+  color: #818CF8;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #F8FAFC;
   margin: 0;
-  color: #000;
 }
 .title span {
-  color: #b59a63;
-  margin: 0 8px;
+  color: #6366F1;
 }
 
-/* ===== LINES ===== */
 .line {
-  width: 380px;
+  width: 100%;
+  max-width: 320px;
   height: 1px;
-  background: #d3b88a;
-  margin: 22px 0 30px;
+  background: rgba(99, 102, 241, 0.3);
+  margin: 20px 0;
 }
 
-/* ===== SUBTITLE ===== */
 .subtitle {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.6;
-  color: #000;
+  color: #CBD5E1;
 }
 
-/* ===== DETAILS ===== */
-.details {
-  margin-top: 6px;
-}
 .details p {
-  font-size: 20px;
+  font-size: 18px;
   margin: 10px 0;
-}
-.details strong {
-  font-weight: 600;
+  color: #F8FAFC;
 }
 
-/* ===== ACTIONS ===== */
+.details strong {
+  color: #818CF8;
+}
+
 .actions {
-  margin-top: 42px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  margin-top: 32px;
 }
 
 .map-btn {
-  padding: 18px 56px;
-  border-radius: 999px;
+  padding: 16px 36px;
+  border-radius: 14px;
   border: none;
-  background: #b59a63;
+  background: linear-gradient(135deg, #6366F1, #4F46E5);
   color: #fff;
-  font-size: 18px;
-  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  transition: background-color 0.3s ease;
-}
-
-.map-btn:hover {
-  background: #a0895a;
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
 }
 
 .map-icon {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  /* Removed the filter property to keep original colors */
+  width: 22px;
+  height: 22px;
 }
 
-/* ================= IMAGE ================= */
 .image-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.image-wrapper img {
-  max-height: 620px;
-  width: auto;
-  max-width: 100%;
-  border-radius: 36px;
-  object-fit: cover;
+
+.tech-graphic {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ================= MOBILE ================= */
+.glow-circle {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulseGlow 3s infinite alternate;
+}
+
+.launch-card-graphic {
+  position: relative;
+  z-index: 2;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  padding: 40px 30px;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.pulse-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.launch-card-graphic h3 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #F8FAFC;
+  margin-bottom: 6px;
+}
+
+.launch-card-graphic p {
+  font-size: 13px;
+  color: #94A3B8;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
 @media (max-width: 900px) {
-  .page {
-    padding: 16px;
-  }
   .card {
     grid-template-columns: 1fr;
-    padding: 40px 28px;
-    gap: 36px;
-  }
-  .image-wrapper {
-    order: -1;
-  }
-  .image-wrapper img {
-    max-height: 340px;
-  }
-  .content {
-    align-items: center;
-    text-align: center;
-  }
-  .line {
-    width: 220px;
-  }
-  .title {
-    font-size: 30px;
-  }
-  .subtitle,
-  .details p {
-    font-size: 16px;
-  }
-  .actions {
-    justify-content: center;
-  }
-  .map-btn {
-    padding: 16px 40px;
-    font-size: 16px;
-  }
-  .map-icon {
-    width: 20px;
-    height: 20px;
+    padding: 32px 24px;
   }
 }
 </style>

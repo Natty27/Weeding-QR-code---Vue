@@ -2,35 +2,67 @@
   <div class="page">
     <!-- HERO -->
     <header class="hero">
-      <h1>Wedding Invitation</h1>
-      <p>Create elegant QR invitations for your guests</p>
+      <div class="brand-badge">🚀 OFFICIAL APP LAUNCH EVENT</div>
+      <h1>Launch Event Pass Manager</h1>
+      <p>Generate, manage & track VIP event access QR passes</p>
+
+      <!-- STATS BAR -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">Total Passes</span>
+          <span class="stat-value">{{ guests.length }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Revoked / Claimed</span>
+          <span class="stat-value success">{{ checkedInCount }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Pending Access</span>
+          <span class="stat-value warning">{{ guests.length - checkedInCount }}</span>
+        </div>
+      </div>
 
       <!-- PRIMARY ACTION -->
       <div class="hero-actions">
         <button class="download-all primary" @click="downloadZip">
-          Download All QR Codes (ZIP)
+          ⚡ Download All Access Passes (ZIP)
+        </button>
+        <button class="btn-secondary" @click="resetAll">
+          🔄 Reset All Check-Ins
         </button>
       </div>
     </header>
 
     <div v-if="isLoading" class="overlay">
-      <div class="loader-heart"></div>
+      <div class="loader-spinner"></div>
     </div>
 
     <!-- GENERATION SECTION -->
-    <section class="actions">
+    <section class="actions-grid">
       <!-- BULK -->
-      <section class="form-card bulk">
-        <h2>Bulk Generate Invitations</h2>
+      <section class="form-card">
+        <h2>Bulk Pass Generator</h2>
+        <p class="card-subtitle">Generate batch QR access passes</p>
+
+        <div class="form-group">
+          <label>Ticket Category</label>
+          <select v-model="bulkTicketType" class="select-input">
+            <option value="Standard">Standard Pass</option>
+            <option value="VIP">VIP Pass</option>
+            <option value="Media/Press">Media & Press</option>
+            <option value="Speaker">Keynote Speaker</option>
+            <option value="Team">Launch Team</option>
+          </select>
+        </div>
 
         <div class="input-group">
           <input
             type="number"
             v-model.number="bulkCount"
-            placeholder="Number of QR codes (e.g. 3000)"
+            placeholder="Quantity (e.g. 500)"
           />
-          <button @click="bulkGenerate" :disabled="isCreating">
-            <span v-if="!isCreating">Generate Bulk</span>
+          <button @click="bulkGenerate" :disabled="isCreating" class="btn-action">
+            <span v-if="!isCreating">Generate Batch</span>
             <span v-else class="spinner"></span>
           </button>
         </div>
@@ -38,65 +70,108 @@
 
       <!-- SINGLE -->
       <section class="form-card">
-        <h2>Add Guest</h2>
+        <h2>Single Access Pass</h2>
+        <p class="card-subtitle">Create a personalized attendee pass</p>
 
-        <div class="input-group">
+        <div class="form-group">
+          <label>Attendee Name (Optional)</label>
           <input
             v-model="name"
-            placeholder="Guest name (optional)"
+            placeholder="e.g. Sarah Connor"
             @keyup.enter="addGuest"
+            class="text-input"
           />
-          <button @click="addGuest" :disabled="isCreating">
-            <span v-if="!isCreating">Generate QR</span>
-            <span v-else class="spinner"></span>
-          </button>
         </div>
+
+        <div class="form-group">
+          <label>Ticket Category</label>
+          <select v-model="singleTicketType" class="select-input">
+            <option value="Standard">Standard Pass</option>
+            <option value="VIP">VIP Pass</option>
+            <option value="Media/Press">Media & Press</option>
+            <option value="Speaker">Keynote Speaker</option>
+            <option value="Team">Launch Team</option>
+          </select>
+        </div>
+
+        <button @click="addGuest" :disabled="isCreating" class="btn-action full-width">
+          <span v-if="!isCreating">+ Create Pass</span>
+          <span v-else class="spinner"></span>
+        </button>
       </section>
     </section>
 
-    <!-- SECONDARY ACTION -->
-    <div class="secondary-actions">
-      <button class="download-all" @click="downloadAll">
-        Download Individually
-      </button>
+    <!-- QR GRID HEADER -->
+    <div class="section-header">
+      <h2>Issued Event Passes ({{ guests.length }})</h2>
     </div>
 
     <!-- QR GRID -->
     <transition-group name="fade-up" tag="section" class="grid">
-      <div v-for="g in guests" :key="g._id" class="guest-card">
+      <div v-for="g in guests" :key="g._id" class="guest-card" :class="{ 'used': g.used }">
+        <div class="card-top">
+          <span class="badge" :class="getBadgeClass(g.ticketType)">
+            {{ g.ticketType || 'Standard' }}
+          </span>
+          <span class="status-indicator" :class="g.used ? 'used' : 'valid'">
+            {{ g.used ? 'REVOKED (CLAIMED)' : 'VALID' }}
+          </span>
+        </div>
+
         <div class="qr-wrapper">
           <canvas :ref="(el) => drawQR(el, g.token)" />
         </div>
 
         <p class="guest-name">
-          {{ g.name || `Invitation #${g.sequence}` }}
+          {{ g.name || `Attendee #${g.sequence}` }}
         </p>
 
-        <span class="token">#{{ g.token.slice(0, 8) }}</span>
+        <div class="card-footer">
+          <span class="token">#{{ g.token ? g.token.slice(0, 8) : 'ACCESS' }}</span>
+          <button v-if="g.used" class="btn-reset-mini" @click="resetGuest(g._id)">Reset</button>
+        </div>
       </div>
     </transition-group>
   </div>
 </template>
+
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import api from "../services/api";
 import QRCode from "qrcode";
 
-// 🔥 CONFIG (CHANGE ONLY HERE IF IP CHANGES)
-const BACKEND_BASE_URL = "http://196.190.251.148:1234";
+const hostname = typeof window !== "undefined" && window.location.hostname ? window.location.hostname : "192.168.0.108";
+const BACKEND_BASE_URL = `http://${hostname}:3000`;
+const FRONTEND_BASE_URL = `http://${hostname}:5173`;
 
 const isCreating = ref(false);
 const isLoading = ref(false);
 
 const name = ref("");
+const singleTicketType = ref("Standard");
+const bulkTicketType = ref("Standard");
+const bulkCount = ref(100);
 const guests = ref([]);
-const bulkCount = ref(3000);
+
+const checkedInCount = computed(() => {
+  return guests.value.filter((g) => g.used).length;
+});
+
+const getBadgeClass = (type) => {
+  switch (type) {
+    case 'VIP': return 'badge-vip';
+    case 'Media/Press': return 'badge-press';
+    case 'Speaker': return 'badge-speaker';
+    case 'Team': return 'badge-team';
+    default: return 'badge-standard';
+  }
+};
 
 const bulkGenerate = async () => {
   if (!bulkCount.value || bulkCount.value < 1) return;
 
   isCreating.value = true;
-  await api.post("/guests/bulk", { count: bulkCount.value });
+  await api.post("/guests/bulk", { count: bulkCount.value, ticketType: bulkTicketType.value });
   await load();
   isCreating.value = false;
 };
@@ -105,7 +180,7 @@ const addGuest = async () => {
   if (isCreating.value) return;
 
   isCreating.value = true;
-  await api.post("/guests", { name: name.value || null });
+  await api.post("/guests", { name: name.value || null, ticketType: singleTicketType.value });
   name.value = "";
   await load();
   isCreating.value = false;
@@ -118,44 +193,30 @@ const load = async () => {
   isLoading.value = false;
 };
 
-// ✅ ZIP DOWNLOAD (BACKEND)
+const resetGuest = async (id) => {
+  await api.post(`/guests/reset/${id}`);
+  await load();
+};
+
+const resetAll = async () => {
+  if (!confirm("Are you sure you want to reset all attendee check-in statuses?")) return;
+  await api.post("/guests/reset-all");
+  await load();
+};
+
 const downloadZip = () => {
   window.location.href = `${BACKEND_BASE_URL}/guests/download/zip`;
 };
 
-// ❌ Optional legacy individual download
-const downloadAll = async () => {
-  for (let i = 0; i < guests.value.length; i++) {
-    const g = guests.value[i];
-
-    const dataUrl = await QRCode.toDataURL(
-      `${BACKEND_BASE_URL}/guests/verify/${g.token}`,
-      { width: 500, margin: 2 }
-    );
-
-    const link = document.createElement("a");
-    const number = String(g.sequence || i + 1).padStart(3, "0");
-    link.href = dataUrl;
-    link.download = `${number}.png`;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    await new Promise((r) => setTimeout(r, 80));
-  }
-};
-
-// 🔥 QR POINTS DIRECTLY TO BACKEND
 const drawQR = (canvas, token) => {
   if (!canvas) return;
 
-  QRCode.toCanvas(canvas, `${BACKEND_BASE_URL}/guests/verify/${token}`, {
-    width: 160,
+  QRCode.toCanvas(canvas, `${FRONTEND_BASE_URL}/guests/verify/${token}`, {
+    width: 150,
     margin: 1,
     color: {
-      dark: "#8b5e3c",
-      light: "#ffffff",
+      dark: "#0F172A",
+      light: "#FFFFFF",
     },
   });
 };
@@ -164,61 +225,177 @@ onMounted(load);
 </script>
 
 <style scoped>
-/* 🌸 Wedding Theme Colors */
-.page {
-  --rose: #f7c6d0;
-  --gold: #c9a24d;
-  --soft: #fffaf8;
-  --dark: #3b2f2f;
-
-  min-height: 100vh;
-  background: linear-gradient(135deg, #fff5f7, #fff);
-  padding: 40px 20px;
-  font-family: "Playfair Display", serif;
-  color: var(--dark);
-}
-
-/* Page */
 .page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fff5f7, #fff);
-  padding: 40px 20px;
-  font-family: "Playfair Display", serif;
-  color: var(--dark);
+  padding: 40px 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  color: #F8FAFC;
 }
 
-/* Hero */
+.brand-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #818CF8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
 .hero {
   text-align: center;
   margin-bottom: 40px;
-  animation: fadeDown 1s ease;
 }
 
 .hero h1 {
-  font-size: 42px;
-  margin-bottom: 6px;
-  color: var(--gold);
+  font-size: 38px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFFFFF, #818CF8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
 }
 
 .hero p {
   font-size: 16px;
-  opacity: 0.8;
+  color: #94A3B8;
+  margin-bottom: 24px;
 }
 
-/* Form */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 28px;
+  border-radius: 16px;
+  min-width: 160px;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  color: #F8FAFC;
+}
+
+.stat-value.success { color: #34D399; }
+.stat-value.warning { color: #FBBF24; }
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.download-all.primary {
+  padding: 14px 28px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6366F1, #4F46E5);
+  color: white;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.download-all.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+}
+
+.btn-secondary {
+  padding: 14px 24px;
+  border-radius: 14px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #CBD5E1;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(51, 65, 85, 0.8);
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
 .form-card {
-  max-width: 420px;
-  margin: 0 auto 40px;
-  padding: 24px;
-  background: white;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  animation: fadeUp 1s ease;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .form-card h2 {
-  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: #94A3B8;
   margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  color: #CBD5E1;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.select-input, .text-input, .input-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #F8FAFC;
+  font-size: 14px;
+  outline: none;
+}
+
+.select-input:focus, .text-input:focus, .input-group input:focus {
+  border-color: #6366F1;
 }
 
 .input-group {
@@ -226,191 +403,148 @@ onMounted(load);
   gap: 10px;
 }
 
-.input-group input {
-  flex: 1;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #eee;
-  font-size: 14px;
-}
-
-.input-group button {
-  padding: 12px 18px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, var(--gold), #e7c97a);
+.btn-action {
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366F1, #4F46E5);
   color: white;
+  font-weight: 700;
+  border: none;
   cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
 }
 
-.input-group button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(201, 162, 77, 0.4);
+.btn-action.full-width {
+  width: 100%;
+  padding: 14px;
 }
 
-/* Grid */
+.section-header {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.section-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 24px;
+  gap: 20px;
 }
 
-/* Guest Card */
 .guest-card {
-  background: white;
-  border-radius: 24px;
-  padding: 20px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 18px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s, border-color 0.2s;
 }
 
 .guest-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
-/* QR */
+.guest-card.used {
+  opacity: 0.75;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.badge-vip { background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.4); }
+.badge-press { background: rgba(236, 72, 153, 0.2); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.4); }
+.badge-speaker { background: rgba(168, 85, 247, 0.2); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.4); }
+.badge-team { background: rgba(14, 165, 233, 0.2); color: #38BDF8; border: 1px solid rgba(14, 165, 233, 0.4); }
+.badge-standard { background: rgba(99, 102, 241, 0.2); color: #818CF8; border: 1px solid rgba(99, 102, 241, 0.4); }
+
+.status-indicator {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.status-indicator.valid { color: #34D399; }
+.status-indicator.used { color: #F87171; }
+
 .qr-wrapper {
-  padding: 14px;
-  border-radius: 18px;
-  background: var(--soft);
+  background: white;
+  padding: 10px;
+  border-radius: 14px;
   display: inline-block;
   margin-bottom: 12px;
-  animation: popIn 0.6s ease;
 }
 
 .guest-name {
-  font-weight: bold;
-  margin-top: 6px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #F8FAFC;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
 }
 
 .token {
   font-size: 11px;
-  opacity: 0.5;
+  color: #64748B;
+  font-family: monospace;
 }
 
-/* Animations */
-.fade-up-enter-active {
-  transition: all 0.6s ease;
-}
-.fade-up-enter-from {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes popIn {
-  0% {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.download-all {
-  margin: 20px auto;
-  display: block;
-  padding: 14px 28px;
-  border-radius: 30px;
-  background: linear-gradient(135deg, #c9a24d, #e7c97a);
-  color: white;
-  font-weight: bold;
-  border: none;
+.btn-reset-mini {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #F87171;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
   cursor: pointer;
-  box-shadow: 0 15px 30px rgba(201, 162, 77, 0.4);
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(255, 250, 248, 0.85);
+  background: rgba(9, 13, 22, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-.loader-heart {
-  width: 40px;
-  height: 40px;
-  background: var(--gold);
-  position: relative;
-  transform: rotate(45deg);
-  animation: pulse 1.2s infinite;
-}
-
-.loader-heart::before,
-.loader-heart::after {
-  content: "";
-  width: 40px;
-  height: 40px;
-  background: var(--gold);
+.loader-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #6366F1;
   border-radius: 50%;
-  position: absolute;
+  animation: spin 0.8s linear infinite;
 }
 
-.loader-heart::before {
-  left: -20px;
-}
-
-.loader-heart::after {
-  top: -20px;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1) rotate(45deg);
-  }
-  50% {
-    transform: scale(1.2) rotate(45deg);
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>
