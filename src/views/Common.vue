@@ -59,8 +59,8 @@ import { ref, onMounted } from "vue";
 import api from "../services/api";
 import QRCode from "qrcode";
 
-// 🔥 CONFIG (CHANGE ONLY HERE IF IP CHANGES)
-const BACKEND_BASE_URL = "http://localhost:3000";
+// 🔥 CONFIG lives in frontend/.env
+import { BACKEND_BASE_URL } from "../config";
 
 const isCreating = ref(false);
 const isLoading = ref(false);

@@ -140,9 +140,7 @@ import { ref, computed, onMounted } from "vue";
 import api from "../services/api";
 import QRCode from "qrcode";
 
-const hostname = typeof window !== "undefined" && window.location.hostname ? window.location.hostname : "192.168.0.108";
-const BACKEND_BASE_URL = `http://${hostname}:3000`;
-const FRONTEND_BASE_URL = `http://${hostname}:5173`;
+import { BACKEND_BASE_URL, FRONTEND_BASE_URL } from "../config";
 
 const isCreating = ref(false);
 const isLoading = ref(false);
