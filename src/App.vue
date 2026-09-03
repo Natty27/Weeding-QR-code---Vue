@@ -1,5 +1,5 @@
 <template>
-  <nav class="top-nav">
+  <nav v-if="showNav" class="top-nav">
     <div class="nav-container">
       <router-link to="/" class="nav-brand">
         🚀 App Launch Platform
@@ -14,6 +14,16 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+
+/**
+ * The guest-facing pages (scanned pass + information page) are full-screen
+ * phone layouts, so the staff navigation only shows on the admin screens.
+ */
+const showNav = computed(() => ["Admin", "AdminPage"].includes(route.name));
 </script>
 
 <style>

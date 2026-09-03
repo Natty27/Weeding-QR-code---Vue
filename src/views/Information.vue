@@ -1,220 +1,830 @@
 <template>
   <div class="page">
-    <div class="card">
-      <!-- LEFT CONTENT -->
-      <div class="content">
-        <div class="launch-badge">🚀 LAUNCH DAY ACCESS PASS</div>
-        <h1 class="title">Product <span>&</span> App Launch</h1>
+    <!-- ambient background -->
+    <div class="bg-arc" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+    <div class="bg-dots" aria-hidden="true"></div>
 
-        <div class="line"></div>
+    <div class="shell">
+      <!-- BRAND -->
+      <header class="brand">
+        <ChinetMark class="brand-mark" :height="38" />
+        <h2 class="brand-name">ChiNet Link</h2>
+      </header>
 
-        <p class="subtitle">
-          Join us live for the official launch keynotes,<br />
-          live product demos, and VIP networking party.
-        </p>
+      <!-- HERO -->
+      <div class="pill">Launch Day · 19 September 2026</div>
 
-        <div class="line"></div>
+      <h1 class="title">
+        Welcome to the<br />
+        ChiNet <span>Launch</span>
+      </h1>
 
-        <div class="details">
-          <p><strong>Date</strong> | Saturday, Launch Day</p>
-          <p><strong>Time</strong> | 10:00 AM UTC</p>
-          <p><strong>Venue</strong> | Innovation Center Main Hall</p>
-        </div>
+      <p class="tagline">You're invited to experience what's next in logistics.</p>
 
-        <div class="actions">
-          <button class="map-btn" @click="openMap">
-            <img :src="mapsIcon" alt="Map Icon" class="map-icon" />
-            View Event Location
-          </button>
-        </div>
-      </div>
-
-      <!-- RIGHT IMAGE / BANNER -->
-      <div class="image-wrapper">
-        <div class="tech-graphic">
-          <div class="glow-circle"></div>
-          <div class="launch-card-graphic">
-            <span class="pulse-icon">🚀</span>
-            <h3>NEXT GEN APP</h3>
-            <p>Official Launch Event Access</p>
+      <!-- EVENT FACTS -->
+      <div class="facts">
+        <div class="fact">
+          <span class="fact-icon"><AppIcon name="calendar" :size="17" /></span>
+          <div class="fact-text">
+            <strong>Saturday, Sep 19</strong>
+            <span>2026</span>
           </div>
         </div>
+
+        <div class="fact">
+          <span class="fact-icon"><AppIcon name="clock" :size="17" /></span>
+          <div class="fact-text">
+            <strong>5:00 PM</strong>
+          </div>
+        </div>
+
+        <button
+          class="fact fact-link"
+          type="button"
+          title="Open the venue in Google Maps"
+          @click="openMap"
+        >
+          <span class="fact-icon"><AppIcon name="pin" :size="17" /></span>
+          <div class="fact-text">
+            <strong>Science Museum</strong>
+            <span>Addis Ababa</span>
+          </div>
+        </button>
       </div>
+
+      <!-- REGISTRATION -->
+      <section class="form-card">
+        <div v-if="done" class="done">
+          <span class="done-icon"><AppIcon name="check" :size="26" :stroke-width="2.4" /></span>
+          <h3>You're on the guest list</h3>
+          <p>Thanks {{ form.name.split(" ")[0] }} — your pass is reserved. Keep this QR code with you for the gate.</p>
+        </div>
+
+        <form v-else novalidate @submit.prevent="submit">
+          <div class="form-head">
+            <span class="form-head-icon"><AppIcon name="user" :size="20" /></span>
+            <div>
+              <h3>Reserve your guest pass</h3>
+              <p>Tell us a little about you so we can prepare your access.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="guest-name">Full name</label>
+            <div class="input-wrap" :class="{ invalid: errors.name }">
+              <span class="input-icon"><AppIcon name="user" :size="16" /></span>
+              <input
+                id="guest-name"
+                v-model="form.name"
+                type="text"
+                autocomplete="name"
+                placeholder="Enter your full name"
+                @input="errors.name = ''"
+              />
+            </div>
+            <p v-if="errors.name" class="field-error">{{ errors.name }}</p>
+          </div>
+
+          <div class="field">
+            <label for="guest-phone">Phone number</label>
+            <div class="input-wrap" :class="{ invalid: errors.phone }">
+              <span class="input-icon"><AppIcon name="phone" :size="16" /></span>
+              <input
+                id="guest-phone"
+                v-model="form.phone"
+                type="tel"
+                inputmode="tel"
+                autocomplete="tel"
+                placeholder="Enter your phone number"
+                @input="errors.phone = ''"
+              />
+            </div>
+            <p v-if="errors.phone" class="field-error">{{ errors.phone }}</p>
+          </div>
+
+          <div class="field">
+            <label>I'm joining as</label>
+            <div class="roles" :class="{ invalid: errors.role }">
+              <button
+                v-for="role in ROLES"
+                :key="role.value"
+                type="button"
+                class="role"
+                :class="{ active: form.role === role.value }"
+                :aria-pressed="form.role === role.value"
+                @click="pickRole(role.value)"
+              >
+                <span v-if="form.role === role.value" class="role-check">
+                  <AppIcon name="check" :size="10" :stroke-width="3.2" />
+                </span>
+                <AppIcon :name="role.icon" :size="24" />
+                <span class="role-label">{{ role.value }}</span>
+              </button>
+            </div>
+            <p v-if="errors.role" class="field-error">{{ errors.role }}</p>
+          </div>
+
+          <div class="field">
+            <label for="guest-company">
+              Company / Organization <span class="optional">(optional)</span>
+            </label>
+            <div class="input-wrap">
+              <span class="input-icon"><AppIcon name="building" :size="16" /></span>
+              <input
+                id="guest-company"
+                v-model="form.company"
+                type="text"
+                autocomplete="organization"
+                placeholder="Enter your company or organization"
+              />
+            </div>
+          </div>
+
+          <p v-if="error" class="form-error">{{ error }}</p>
+
+          <button class="submit" type="submit" :disabled="submitting">
+            <span v-if="submitting" class="spinner"></span>
+            <AppIcon v-else name="ticket" :size="18" />
+            {{ submitting ? "Reserving your pass…" : "Confirm & Get My Pass" }}
+          </button>
+
+          <p class="privacy">
+            <AppIcon name="lock" :size="13" />
+            Your information is used only for event registration.
+          </p>
+        </form>
+      </section>
+
+      <!-- PERKS -->
+      <section class="perks">
+        <div v-for="perk in PERKS" :key="perk.title" class="perk">
+          <AppIcon :name="perk.icon" :size="18" />
+          <strong>{{ perk.title }}</strong>
+          <span>{{ perk.text }}</span>
+        </div>
+      </section>
+
+      <footer class="foot">© 2026 ChiNet Link. All rights reserved.</footer>
     </div>
   </div>
 </template>
 
 <script setup>
-import mapsIcon from "@/assets/Google_Maps_icon_(2020).svg";
+import { computed, reactive, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import api from "../services/api";
+import AppIcon from "@/components/AppIcon.vue";
+import ChinetMark from "@/components/ChinetMark.vue";
 
-const openMap = () => {
-  window.open(
-    "https://maps.google.com",
-    "_blank"
-  );
+const props = defineProps({
+  /** Token of the printed pass the attendee just scanned, when embedded in the pass flow */
+  token: { type: String, default: "" },
+  /** Anything already known about the guest, used to prefill the form */
+  guest: { type: Object, default: null },
+});
+
+const emit = defineEmits(["registered"]);
+
+const route = useRoute();
+const router = useRouter();
+
+const ROLES = [
+  { value: "Carrier", icon: "truck" },
+  { value: "Shipper", icon: "package" },
+  { value: "Broker", icon: "handshake" },
+  { value: "Government Official", icon: "landmark" },
+  { value: "Other", icon: "dots" },
+];
+
+const PERKS = [
+  { icon: "shield", title: "Exclusive Access", text: "Be part of the official ChiNet Launch" },
+  { icon: "star", title: "Product Demos", text: "See the next generation in action" },
+  { icon: "users", title: "VIP Networking", text: "Connect with industry leaders" },
+  { icon: "gift", title: "Priority Benefits", text: "Early access and special offers" },
+];
+
+/** Ethiopian Science Museum, Addis Ababa (9.0214518, 38.7624086) */
+const MAP_URL = "https://maps.app.goo.gl/1uPKfZMXKpbJU6yy7";
+
+/** Pass token: from the parent (scan flow), the route, or ?token= */
+const passToken = computed(
+  () => props.token || route.params.token || route.query.token || "",
+);
+
+const form = reactive({ name: "", phone: "", role: "", company: "" });
+const errors = reactive({ name: "", phone: "", role: "" });
+const error = ref("");
+const submitting = ref(false);
+const done = ref(false);
+
+watch(
+  () => props.guest,
+  (guest) => {
+    if (!guest) return;
+    // Only prefill real details, never the generated "Attendee #12" placeholder
+    if (guest.name && !/^Attendee #/.test(guest.name)) form.name = guest.name;
+    if (guest.phone) form.phone = guest.phone;
+    if (guest.role) form.role = guest.role;
+    if (guest.company) form.company = guest.company;
+  },
+  { immediate: true },
+);
+
+const pickRole = (value) => {
+  form.role = value;
+  errors.role = "";
+};
+
+const openMap = () => window.open(MAP_URL, "_blank", "noopener");
+
+const validate = () => {
+  errors.name = form.name.trim().length < 2 ? "Please enter your full name" : "";
+  errors.phone = /^[+\d][\d\s()-]{5,}$/.test(form.phone.trim())
+    ? ""
+    : "Please enter a valid phone number";
+  errors.role = form.role ? "" : "Choose what you're joining as";
+
+  return !errors.name && !errors.phone && !errors.role;
+};
+
+const submit = async () => {
+  error.value = "";
+  if (!validate()) return;
+
+  submitting.value = true;
+
+  try {
+    const payload = {
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      role: form.role,
+      company: form.company.trim(),
+    };
+
+    const url = passToken.value
+      ? `/guests/register/${passToken.value}`
+      : "/guests/register";
+
+    const res = await api.post(url, payload);
+
+    done.value = true;
+
+    if (passToken.value) {
+      // The pass view takes over and shows the QR pass
+      emit("registered", res.data);
+    } else if (res.data?.token) {
+      router.push(`/guests/verify/${res.data.token}`);
+    }
+  } catch (e) {
+    error.value =
+      e.response?.data?.message ||
+      "We couldn't reserve your pass. Please check your connection and try again.";
+  } finally {
+    submitting.value = false;
+  }
 };
 </script>
 
 <style scoped>
 .page {
+  position: relative;
   min-height: 100vh;
-  padding: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 50% 20%, #1E1B4B 0%, #090D16 80%);
+  overflow: hidden;
+  padding: 28px 18px 40px;
+  /* stated here so the page keeps its type even outside the global stylesheet */
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(120% 70% at 50% -10%, #1b1a4d 0%, transparent 60%),
+    linear-gradient(180deg, #0b0f24 0%, #080b18 100%);
 }
 
-.card {
+/* --- ambient background --- */
+.bg-arc,
+.bg-glow,
+.bg-dots {
+  position: absolute;
+  pointer-events: none;
+}
+
+.bg-arc {
+  top: -46vw;
+  left: 50%;
+  width: 132vw;
+  height: 132vw;
+  max-width: 900px;
+  max-height: 900px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 1px solid rgba(129, 140, 248, 0.22);
+  box-shadow: 0 0 90px rgba(99, 102, 241, 0.18) inset;
+}
+
+.bg-glow {
+  top: -140px;
+  left: 50%;
+  width: 460px;
+  height: 460px;
+  transform: translateX(-60%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 65%);
+  filter: blur(10px);
+}
+
+.bg-dots {
+  top: 40px;
+  right: -20px;
+  width: 180px;
+  height: 320px;
+  opacity: 0.5;
+  background-image: radial-gradient(rgba(148, 163, 255, 0.28) 1px, transparent 1px);
+  background-size: 16px 16px;
+  mask-image: linear-gradient(to left, #000, transparent);
+  -webkit-mask-image: linear-gradient(to left, #000, transparent);
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 1200px;
-  padding: 60px;
-  border-radius: 36px;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 48px;
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
 }
 
-.content {
+/* --- brand --- */
+.brand {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  text-align: left;
+  align-items: center;
+  gap: 10px;
 }
 
-.launch-badge {
-  display: inline-block;
-  font-size: 12px;
+.brand-mark {
+  /* size lives on the component's `height` prop, this only sets the colour */
+  color: #f8fafc;
+}
+
+.brand-name {
+  margin: 0;
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: 15px;
   font-weight: 700;
-  color: #818CF8;
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: #f1f5f9;
+}
+
+/* --- hero --- */
+.pill {
+  display: inline-block;
+  margin: 22px 0 18px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  background: rgba(99, 102, 241, 0.14);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #c7d2fe;
 }
 
 .title {
-  font-size: 48px;
-  font-weight: 800;
-  color: #F8FAFC;
   margin: 0;
-}
-.title span {
-  color: #6366F1;
-}
-
-.line {
-  width: 100%;
-  max-width: 320px;
-  height: 1px;
-  background: rgba(99, 102, 241, 0.3);
-  margin: 20px 0;
-}
-
-.subtitle {
-  font-size: 18px;
-  line-height: 1.6;
-  color: #CBD5E1;
-}
-
-.details p {
-  font-size: 18px;
-  margin: 10px 0;
-  color: #F8FAFC;
-}
-
-.details strong {
-  color: #818CF8;
-}
-
-.actions {
-  margin-top: 32px;
-}
-
-.map-btn {
-  padding: 16px 36px;
-  border-radius: 14px;
-  border: none;
-  background: linear-gradient(135deg, #6366F1, #4F46E5);
-  color: #fff;
-  font-size: 16px;
+  font-family: "Playfair Display", "Outfit", Georgia, serif;
+  font-size: clamp(33px, 9.5vw, 46px);
   font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: #f8fafc;
+}
+
+.title span {
+  color: #6366f1;
+}
+
+.tagline {
+  max-width: 34ch;
+  margin: 14px auto 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #94a3b8;
+  text-wrap: balance;
+}
+
+/* --- event facts --- */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 26px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(17, 24, 45, 0.6);
+  overflow: hidden;
+}
+
+.fact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 12px;
+  text-align: left;
+  border: none;
+  background: none;
+  font: inherit;
+}
+
+.fact + .fact {
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.fact-link {
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fact-link:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.fact-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.16);
+  color: #a5b4fc;
+}
+
+.fact-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.fact-text strong {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.fact-text span {
+  font-size: 11.5px;
+  color: #8a93a8;
+}
+
+/* --- registration card --- */
+.form-card {
+  margin-top: 18px;
+  padding: 22px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(13, 19, 38, 0.75);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 50px rgba(4, 6, 16, 0.5);
+  text-align: left;
+}
+
+.form-head {
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+  margin-bottom: 22px;
 }
 
-.map-icon {
-  width: 22px;
-  height: 22px;
+.form-head-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: rgba(99, 102, 241, 0.16);
+  color: #a5b4fc;
 }
 
-.image-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.form-head h3 {
+  margin: 0 0 3px;
+  font-family: "Playfair Display", "Outfit", Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: #f8fafc;
 }
 
-.tech-graphic {
-  position: relative;
-  width: 100%;
-  height: 380px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.form-head p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #8a93a8;
 }
 
-.glow-circle {
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: pulseGlow 3s infinite alternate;
+.field {
+  margin-bottom: 16px;
 }
 
-.launch-card-graphic {
-  position: relative;
-  z-index: 2;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px);
-  padding: 40px 30px;
-  border-radius: 24px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-.pulse-icon {
-  font-size: 48px;
+.field label {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
-.launch-card-graphic h3 {
-  font-size: 22px;
-  font-weight: 800;
-  color: #F8FAFC;
-  margin-bottom: 6px;
+.optional {
+  font-weight: 500;
+  color: #7c879e;
 }
 
-.launch-card-graphic p {
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  display: grid;
+  place-items: center;
+  color: #6b7a99;
+  pointer-events: none;
+}
+
+.input-wrap input {
+  width: 100%;
+  padding: 13px 14px 13px 40px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(8, 12, 26, 0.7);
+  color: #f1f5f9;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrap input::placeholder {
+  color: #5f6b85;
+}
+
+.input-wrap input:focus {
+  border-color: rgba(99, 102, 241, 0.7);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.input-wrap.invalid input {
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+.field-error {
+  margin: 7px 0 0;
+  font-size: 11px;
+  color: #f87171;
+}
+
+/* --- role picker --- */
+.roles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 9px;
+}
+
+.role {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 4px 13px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 12, 26, 0.55);
+  color: #94a3b8;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.role:hover {
+  border-color: rgba(129, 140, 248, 0.4);
+  color: #cbd5e1;
+}
+
+.role.active {
+  border-color: #5b5bf5;
+  background: rgba(91, 91, 245, 0.14);
+  color: #f8fafc;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.role-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  /* room for a two-word role so every tile keeps the same height */
+  min-height: 2.5em;
+}
+
+.role-check {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #0d1326;
+  background: #5b5bf5;
+  color: #fff;
+}
+
+.roles.invalid .role {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+/* --- submit --- */
+.form-error {
+  margin: 0 0 14px;
+  padding: 11px 13px;
+  border-radius: 11px;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.1);
+  font-size: 12.5px;
+  color: #fca5a5;
+}
+
+.submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(79, 70, 229, 0.35);
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.45);
+}
+
+.submit:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.privacy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  font-size: 11px;
+  color: #6b7a99;
+}
+
+/* --- success state --- */
+.done {
+  text-align: center;
+  padding: 12px 4px;
+}
+
+.done-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #34d399;
+}
+
+.done h3 {
+  margin: 0 0 8px;
+  font-family: "Playfair Display", "Outfit", Georgia, serif;
+  font-size: 20px;
+  color: #f8fafc;
+}
+
+.done p {
+  margin: 0;
   font-size: 13px;
-  color: #94A3B8;
+  line-height: 1.55;
+  color: #94a3b8;
 }
 
-@keyframes pulseGlow {
-  0% { transform: scale(0.9); opacity: 0.5; }
-  100% { transform: scale(1.1); opacity: 1; }
+/* --- perks --- */
+.perks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+  padding: 18px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(13, 19, 38, 0.55);
+  text-align: left;
 }
 
-@media (max-width: 900px) {
-  .card {
+.perk {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #818cf8;
+}
+
+.perk strong {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.perk span {
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: #7c879e;
+}
+
+.foot {
+  margin-top: 22px;
+  font-size: 11px;
+  color: #5a6478;
+}
+
+/* --- narrow phones: keep the three facts side by side, just tighter --- */
+@media (max-width: 520px) {
+  .fact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 13px 10px;
+  }
+
+  .fact-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+  }
+
+  .fact-text strong,
+  .fact-text span {
+    font-size: 10.5px;
+  }
+
+  .perks {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* five tiles are too narrow on a phone, so they run three then two */
+  .roles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 340px) {
+  .facts {
     grid-template-columns: 1fr;
-    padding: 32px 24px;
+  }
+
+  .fact + .fact {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .roles {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>
