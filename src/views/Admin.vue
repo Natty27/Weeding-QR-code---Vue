@@ -30,7 +30,12 @@
         <button class="btn-secondary" @click="resetAll">
           🔄 Reset All Check-Ins
         </button>
+        <button class="btn-secondary" @click="signOut">
+          Sign out
+        </button>
       </div>
+
+      <p v-if="authError" class="auth-error">{{ authError }}</p>
     </header>
 
     <div v-if="isLoading" class="overlay">
@@ -137,13 +142,34 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import api from "../services/api";
 import QRCode from "qrcode";
+import { clearStaffKey } from "../services/auth";
 
-import { BACKEND_BASE_URL, FRONTEND_BASE_URL } from "../config";
+import { FRONTEND_BASE_URL } from "../config";
+
+const router = useRouter();
 
 const isCreating = ref(false);
 const isLoading = ref(false);
+const authError = ref("");
+
+/** A 401 means the stored staff key is gone or wrong: sign back in */
+const handleError = (e) => {
+  if (e.response?.status === 401 || e.response?.status === 503) {
+    clearStaffKey();
+    router.replace({ name: "Login", query: { redirect: "/admin" } });
+    return;
+  }
+
+  authError.value = e.response?.data?.message || "Something went wrong. Please try again.";
+};
+
+const signOut = () => {
+  clearStaffKey();
+  router.replace({ name: "Login" });
+};
 
 const name = ref("");
 const singleTicketType = ref("Standard");
@@ -169,41 +195,80 @@ const bulkGenerate = async () => {
   if (!bulkCount.value || bulkCount.value < 1) return;
 
   isCreating.value = true;
-  await api.post("/guests/bulk", { count: bulkCount.value, ticketType: bulkTicketType.value });
-  await load();
-  isCreating.value = false;
+  try {
+    await api.post("/guests/bulk", { count: bulkCount.value, ticketType: bulkTicketType.value });
+    await load();
+  } catch (e) {
+    handleError(e);
+  } finally {
+    isCreating.value = false;
+  }
 };
 
 const addGuest = async () => {
   if (isCreating.value) return;
 
   isCreating.value = true;
-  await api.post("/guests", { name: name.value || null, ticketType: singleTicketType.value });
-  name.value = "";
-  await load();
-  isCreating.value = false;
+  try {
+    await api.post("/guests", { name: name.value || null, ticketType: singleTicketType.value });
+    name.value = "";
+    await load();
+  } catch (e) {
+    handleError(e);
+  } finally {
+    isCreating.value = false;
+  }
 };
 
 const load = async () => {
   isLoading.value = true;
-  const res = await api.get("/guests");
-  guests.value = res.data.reverse();
-  isLoading.value = false;
+  try {
+    const res = await api.get("/guests");
+    guests.value = res.data.reverse();
+    authError.value = "";
+  } catch (e) {
+    handleError(e);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const resetGuest = async (id) => {
-  await api.post(`/guests/reset/${id}`);
-  await load();
+  try {
+    await api.post(`/guests/reset/${id}`);
+    await load();
+  } catch (e) {
+    handleError(e);
+  }
 };
 
 const resetAll = async () => {
   if (!confirm("Are you sure you want to reset all attendee check-in statuses?")) return;
-  await api.post("/guests/reset-all");
-  await load();
+  try {
+    await api.post("/guests/reset-all");
+    await load();
+  } catch (e) {
+    handleError(e);
+  }
 };
 
-const downloadZip = () => {
-  window.location.href = `${BACKEND_BASE_URL}/guests/download/zip`;
+/**
+ * Fetched rather than navigated to, because a plain browser navigation cannot
+ * carry the staff key header the download route now requires.
+ */
+const downloadZip = async () => {
+  try {
+    const res = await api.get("/guests/download/zip", { responseType: "blob" });
+    const url = URL.createObjectURL(res.data);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "chinet_launch_access_passes.zip";
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    handleError(e);
+  }
 };
 
 const drawQR = (canvas, token) => {
@@ -338,6 +403,17 @@ onMounted(load);
 
 .btn-secondary:hover {
   background: rgba(51, 65, 85, 0.8);
+}
+
+.auth-error {
+  max-width: 520px;
+  margin: 16px auto 0;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.1);
+  font-size: 13px;
+  color: #FCA5A5;
 }
 
 .actions-grid {

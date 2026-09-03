@@ -61,6 +61,17 @@
           <p>Thanks {{ form.name.split(" ")[0] }} — your pass is reserved. Keep this QR code with you for the gate.</p>
         </div>
 
+        <!-- No scanned pass and not staff: nothing to issue a pass against -->
+        <div v-else-if="!canIssuePass" class="locked">
+          <span class="locked-icon"><AppIcon name="ticket" :size="24" /></span>
+          <h3>Scan your pass to register</h3>
+          <p>
+            Your details are collected from the QR code on your ChiNet Link pass.
+            Scan it with your phone camera to reserve your guest pass.
+          </p>
+          <router-link class="staff-link" to="/login">Event staff sign-in</router-link>
+        </div>
+
         <form v-else novalidate @submit.prevent="submit">
           <div class="form-head">
             <span class="form-head-icon"><AppIcon name="user" :size="20" /></span>
@@ -174,6 +185,7 @@
 import { computed, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import api from "../services/api";
+import { isStaff } from "../services/auth";
 import AppIcon from "@/components/AppIcon.vue";
 import ChinetMark from "@/components/ChinetMark.vue";
 
@@ -211,6 +223,12 @@ const MAP_URL = "https://maps.app.goo.gl/1uPKfZMXKpbJU6yy7";
 const passToken = computed(
   () => props.token || route.params.token || route.query.token || "",
 );
+
+/**
+ * A pass can only be issued against a scanned QR code, or by signed-in staff
+ * registering someone who turned up without a printed pass.
+ */
+const canIssuePass = computed(() => !!passToken.value || isStaff());
 
 const form = reactive({ name: "", phone: "", role: "", company: "" });
 const errors = reactive({ name: "", phone: "", role: "" });
@@ -277,9 +295,14 @@ const submit = async () => {
       router.push(`/guests/verify/${res.data.token}`);
     }
   } catch (e) {
-    error.value =
-      e.response?.data?.message ||
-      "We couldn't reserve your pass. Please check your connection and try again.";
+    if (e.response?.status === 401 && !passToken.value) {
+      error.value =
+        "Staff sign-in has expired. Sign in again to issue a pass, or scan the guest's printed pass.";
+    } else {
+      error.value =
+        e.response?.data?.message ||
+        "We couldn't reserve your pass. Please check your connection and try again.";
+    }
   } finally {
     submitting.value = false;
   }
@@ -743,6 +766,50 @@ const submit = async () => {
   font-size: 13px;
   line-height: 1.55;
   color: #94a3b8;
+}
+
+/* --- no pass to register against --- */
+.locked {
+  padding: 10px 4px;
+  text-align: center;
+}
+
+.locked-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.14);
+  color: #a5b4fc;
+}
+
+.locked h3 {
+  margin: 0 0 8px;
+  font-family: "Playfair Display", "Outfit", Georgia, serif;
+  font-size: 19px;
+  color: #f8fafc;
+}
+
+.locked p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #94a3b8;
+}
+
+.staff-link {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 11.5px;
+  color: #6b7a99;
+  text-decoration: none;
+}
+
+.staff-link:hover {
+  color: #a5b4fc;
 }
 
 /* --- perks --- */
