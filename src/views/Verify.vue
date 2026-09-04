@@ -28,9 +28,15 @@
       <p class="org" v-if="guestOrg">{{ guestOrg }}</p>
       <p class="status valid">VALID FOR ENTRY</p>
 
-      <button class="download" type="button" :disabled="!qrImage" @click="downloadQr">
-        <AppIcon name="download" :size="16" />
-        Save my pass
+      <button
+        class="download"
+        type="button"
+        :disabled="!qrImage || saving"
+        @click="downloadQr"
+      >
+        <AppIcon v-if="!saving" name="download" :size="16" />
+        <span v-else class="spinner spinner-sm"></span>
+        {{ saving ? "Preparing your pass…" : "Save my pass" }}
       </button>
 
       <p class="notice">
@@ -69,6 +75,7 @@ import Information from "./Information.vue";
 import AppIcon from "@/components/AppIcon.vue";
 import QRCode from "qrcode";
 import { FRONTEND_BASE_URL } from "../config";
+import { composePassImage } from "../services/passImage";
 
 const route = useRoute();
 
@@ -136,11 +143,31 @@ const passFileName = computed(() => {
   return `ChiNet-Launch-Pass-${who}.png`;
 });
 
+const saving = ref(false);
+
 const downloadQr = async () => {
-  if (!qrImage.value) return;
+  if (!qrImage.value || saving.value) return;
+
+  saving.value = true;
+
+  let blob;
+
+  try {
+    // the full pass card: brand, event, guest, and the QR at the bottom
+    blob = await composePassImage({
+      qrDataUrl: qrImage.value,
+      name: guestName.value,
+      org: guestOrg.value,
+      ticketType: ticketType.value,
+    });
+  } catch {
+    // if compositing fails for any reason, fall back to the bare QR
+    blob = await (await fetch(qrImage.value)).blob();
+  } finally {
+    saving.value = false;
+  }
 
   // a blob URL is what mobile browsers handle best for saving an image
-  const blob = await (await fetch(qrImage.value)).blob();
   const url = URL.createObjectURL(blob);
 
   if (canDownload) {
@@ -345,6 +372,14 @@ onMounted(async () => {
 .download:disabled {
   opacity: 0.5;
   cursor: wait;
+}
+
+.spinner-sm {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  border-width: 2px;
+  border-top-color: #c7d2fe;
 }
 
 .status {

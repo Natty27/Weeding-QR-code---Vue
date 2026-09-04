@@ -9,31 +9,31 @@
       <section class="screen">
         <header class="brand">
           <ChinetMark class="brand-mark" :height="30" />
-          <h2 class="brand-name">ChiNet Link</h2>
+          <h2 class="brand-name">{{ EVENT.brand }}</h2>
         </header>
 
-        <div class="pill">Launch Day · 19 September 2026</div>
+        <div class="pill">{{ EVENT.badge }}</div>
 
         <h1 class="title">
           Welcome to the<br />
           ChiNet <span>Launch</span>
         </h1>
 
-        <p class="tagline">You're invited to experience what's next in logistics.</p>
+        <p class="tagline">{{ EVENT.tagline }}</p>
 
         <div class="facts">
           <div class="fact">
             <span class="fact-icon"><AppIcon name="calendar" :size="15" /></span>
             <div class="fact-text">
-              <strong>Sat, Sep 19</strong>
-              <span>2026</span>
+              <strong>{{ EVENT.dayShort }}</strong>
+              <span>{{ EVENT.year }}</span>
             </div>
           </div>
 
           <div class="fact">
             <span class="fact-icon"><AppIcon name="clock" :size="15" /></span>
             <div class="fact-text">
-              <strong>5:00 PM</strong>
+              <strong>{{ EVENT.time }}</strong>
             </div>
           </div>
 
@@ -45,8 +45,8 @@
           >
             <span class="fact-icon"><AppIcon name="pin" :size="15" /></span>
             <div class="fact-text">
-              <strong>Science Museum</strong>
-              <span>Addis Ababa</span>
+              <strong>{{ EVENT.venue }}</strong>
+              <span>{{ EVENT.city }}</span>
             </div>
           </button>
         </div>
@@ -54,7 +54,7 @@
         <!-- No scanned pass and not staff: nothing to issue a pass against -->
         <div v-if="!canIssuePass" class="locked">
           <h3>Scan your pass to register</h3>
-          <p>Your details are collected from the QR code on your ChiNet Link pass.</p>
+          <p>Your details are collected from the QR code on your {{ EVENT.brand }} pass.</p>
           <router-link class="staff-link" to="/login">Event staff sign-in</router-link>
         </div>
 
@@ -155,7 +155,7 @@
           </button>
         </form>
 
-        <footer class="foot">© 2026 ChiNet Link. All rights reserved.</footer>
+        <footer class="foot">© {{ EVENT.year }} {{ EVENT.brand }}. All rights reserved.</footer>
       </section>
     </div>
   </div>
@@ -166,6 +166,7 @@ import { computed, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import api from "../services/api";
 import { isStaff } from "../services/auth";
+import { EVENT } from "../event";
 import AppIcon from "@/components/AppIcon.vue";
 import ChinetMark from "@/components/ChinetMark.vue";
 
@@ -188,9 +189,6 @@ const ROLES = [
   { value: "Government Official", icon: "landmark" },
   { value: "Other", icon: "dots" },
 ];
-
-/** Ethiopian Science Museum, Addis Ababa (9.0214518, 38.7624086) */
-const MAP_URL = "https://maps.app.goo.gl/1uPKfZMXKpbJU6yy7";
 
 /** Pass token: from the parent (scan flow), the route, or ?token= */
 const passToken = computed(
@@ -235,7 +233,7 @@ const pickRole = (value) => {
   errors.role = "";
 };
 
-const openMap = () => window.open(MAP_URL, "_blank", "noopener");
+const openMap = () => window.open(EVENT.mapUrl, "_blank", "noopener");
 
 const validate = () => {
   errors.name = form.name.trim().length < 2 ? "Please enter your full name" : "";
