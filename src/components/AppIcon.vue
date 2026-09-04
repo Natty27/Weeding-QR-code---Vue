@@ -50,6 +50,7 @@ const ICONS = {
   gift: '<rect x="3" y="8.5" width="18" height="12" rx="2"/><path d="M3 13h18M12 8.5v12"/><path d="M12 8.5S10.6 4 8.2 4a2.3 2.3 0 0 0 0 4.5ZM12 8.5S13.4 4 15.8 4a2.3 2.3 0 0 1 0 4.5Z"/>',
   lock: '<rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
   check: '<path d="m5 12.8 4.6 4.7L19 7"/>',
+  'arrow-left': '<path d="M19 12H5"/><path d="m11 18-6-6 6-6"/>',
   alert:
     '<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><circle cx="12" cy="16.3" r="1" fill="currentColor" stroke="none"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 16.5V11"/><circle cx="12" cy="7.9" r="1" fill="currentColor" stroke="none"/>',

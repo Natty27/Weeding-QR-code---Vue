@@ -6,177 +6,187 @@
     <div class="bg-dots" aria-hidden="true"></div>
 
     <div class="shell">
-      <!-- BRAND -->
-      <header class="brand">
-        <ChinetMark class="brand-mark" :height="38" />
-        <h2 class="brand-name">ChiNet Link</h2>
-      </header>
+      <Transition name="swap" mode="out-in">
+        <!-- ===== SCREEN 1: the invitation ===== -->
+        <section v-if="step === 'welcome'" key="welcome" class="screen">
+          <header class="brand">
+            <ChinetMark class="brand-mark" :height="34" />
+            <h2 class="brand-name">ChiNet Link</h2>
+          </header>
 
-      <!-- HERO -->
-      <div class="pill">Launch Day · 19 September 2026</div>
+          <div class="pill">Launch Day · 19 September 2026</div>
 
-      <h1 class="title">
-        Welcome to the<br />
-        ChiNet <span>Launch</span>
-      </h1>
+          <h1 class="title">
+            Welcome to the<br />
+            ChiNet <span>Launch</span>
+          </h1>
 
-      <p class="tagline">You're invited to experience what's next in logistics.</p>
+          <p class="tagline">You're invited to experience what's next in logistics.</p>
 
-      <!-- EVENT FACTS -->
-      <div class="facts">
-        <div class="fact">
-          <span class="fact-icon"><AppIcon name="calendar" :size="17" /></span>
-          <div class="fact-text">
-            <strong>Saturday, Sep 19</strong>
-            <span>2026</span>
-          </div>
-        </div>
-
-        <div class="fact">
-          <span class="fact-icon"><AppIcon name="clock" :size="17" /></span>
-          <div class="fact-text">
-            <strong>5:00 PM</strong>
-          </div>
-        </div>
-
-        <button
-          class="fact fact-link"
-          type="button"
-          title="Open the venue in Google Maps"
-          @click="openMap"
-        >
-          <span class="fact-icon"><AppIcon name="pin" :size="17" /></span>
-          <div class="fact-text">
-            <strong>Science Museum</strong>
-            <span>Addis Ababa</span>
-          </div>
-        </button>
-      </div>
-
-      <!-- REGISTRATION -->
-      <section class="form-card">
-        <div v-if="done" class="done">
-          <span class="done-icon"><AppIcon name="check" :size="26" :stroke-width="2.4" /></span>
-          <h3>You're on the guest list</h3>
-          <p>Thanks {{ form.name.split(" ")[0] }} — your pass is reserved. Keep this QR code with you for the gate.</p>
-        </div>
-
-        <!-- No scanned pass and not staff: nothing to issue a pass against -->
-        <div v-else-if="!canIssuePass" class="locked">
-          <span class="locked-icon"><AppIcon name="ticket" :size="24" /></span>
-          <h3>Scan your pass to register</h3>
-          <p>
-            Your details are collected from the QR code on your ChiNet Link pass.
-            Scan it with your phone camera to reserve your guest pass.
-          </p>
-          <router-link class="staff-link" to="/login">Event staff sign-in</router-link>
-        </div>
-
-        <form v-else novalidate @submit.prevent="submit">
-          <div class="form-head">
-            <span class="form-head-icon"><AppIcon name="user" :size="20" /></span>
-            <div>
-              <h3>Reserve your guest pass</h3>
-              <p>Tell us a little about you so we can prepare your access.</p>
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-icon"><AppIcon name="calendar" :size="16" /></span>
+              <div class="fact-text">
+                <strong>Saturday, Sep 19</strong>
+                <span>2026</span>
+              </div>
             </div>
-          </div>
 
-          <div class="field">
-            <label for="guest-name">Full name</label>
-            <div class="input-wrap" :class="{ invalid: errors.name }">
-              <span class="input-icon"><AppIcon name="user" :size="16" /></span>
-              <input
-                id="guest-name"
-                v-model="form.name"
-                type="text"
-                autocomplete="name"
-                placeholder="Enter your full name"
-                @input="errors.name = ''"
-              />
+            <div class="fact">
+              <span class="fact-icon"><AppIcon name="clock" :size="16" /></span>
+              <div class="fact-text">
+                <strong>5:00 PM</strong>
+              </div>
             </div>
-            <p v-if="errors.name" class="field-error">{{ errors.name }}</p>
+
+            <button
+              class="fact fact-link"
+              type="button"
+              title="Open the venue in Google Maps"
+              @click="openMap"
+            >
+              <span class="fact-icon"><AppIcon name="pin" :size="16" /></span>
+              <div class="fact-text">
+                <strong>Science Museum</strong>
+                <span>Addis Ababa</span>
+              </div>
+            </button>
           </div>
 
-          <div class="field">
-            <label for="guest-phone">Phone number</label>
-            <div class="input-wrap" :class="{ invalid: errors.phone }">
-              <span class="input-icon"><AppIcon name="phone" :size="16" /></span>
-              <input
-                id="guest-phone"
-                v-model="form.phone"
-                type="tel"
-                inputmode="tel"
-                autocomplete="tel"
-                placeholder="Enter your phone number"
-                @input="errors.phone = ''"
-              />
-            </div>
-            <p v-if="errors.phone" class="field-error">{{ errors.phone }}</p>
+          <!-- No scanned pass and not staff: nothing to issue a pass against -->
+          <div v-if="!canIssuePass" class="locked">
+            <h3>Scan your pass to register</h3>
+            <p>Your details are collected from the QR code on your ChiNet Link pass.</p>
+            <router-link class="staff-link" to="/login">Event staff sign-in</router-link>
           </div>
 
-          <div class="field">
-            <label>I'm joining as</label>
-            <div class="roles" :class="{ invalid: errors.role }">
-              <button
-                v-for="role in ROLES"
-                :key="role.value"
-                type="button"
-                class="role"
-                :class="{ active: form.role === role.value }"
-                :aria-pressed="form.role === role.value"
-                @click="pickRole(role.value)"
-              >
-                <span v-if="form.role === role.value" class="role-check">
-                  <AppIcon name="check" :size="10" :stroke-width="3.2" />
-                </span>
-                <AppIcon :name="role.icon" :size="24" />
-                <span class="role-label">{{ role.value }}</span>
-              </button>
-            </div>
-            <p v-if="errors.role" class="field-error">{{ errors.role }}</p>
-          </div>
-
-          <div class="field">
-            <label for="guest-company">
-              Company / Organization <span class="optional">(optional)</span>
-            </label>
-            <div class="input-wrap">
-              <span class="input-icon"><AppIcon name="building" :size="16" /></span>
-              <input
-                id="guest-company"
-                v-model="form.company"
-                type="text"
-                autocomplete="organization"
-                placeholder="Enter your company or organization"
-              />
-            </div>
-          </div>
-
-          <p v-if="error" class="form-error">{{ error }}</p>
-
-          <button class="submit" type="submit" :disabled="submitting">
-            <span v-if="submitting" class="spinner"></span>
-            <AppIcon v-else name="ticket" :size="18" />
-            {{ submitting ? "Reserving your pass…" : "Confirm & Get My Pass" }}
+          <button v-else class="submit start" type="button" @click="step = 'form'">
+            <AppIcon name="ticket" :size="18" />
+            Reserve your guest pass
           </button>
 
-          <p class="privacy">
-            <AppIcon name="lock" :size="13" />
-            Your information is used only for event registration.
-          </p>
-        </form>
-      </section>
+          <ul class="perks">
+            <li v-for="perk in PERKS" :key="perk.title">
+              <AppIcon :name="perk.icon" :size="15" />
+              {{ perk.title }}
+            </li>
+          </ul>
 
-      <!-- PERKS -->
-      <section class="perks">
-        <div v-for="perk in PERKS" :key="perk.title" class="perk">
-          <AppIcon :name="perk.icon" :size="18" />
-          <strong>{{ perk.title }}</strong>
-          <span>{{ perk.text }}</span>
-        </div>
-      </section>
+          <footer class="foot">© 2026 ChiNet Link. All rights reserved.</footer>
+        </section>
 
-      <footer class="foot">© 2026 ChiNet Link. All rights reserved.</footer>
+        <!-- ===== SCREEN 2: the form ===== -->
+        <section v-else key="form" class="screen">
+          <div v-if="done" class="form-card">
+            <div class="done">
+              <span class="done-icon">
+                <AppIcon name="check" :size="26" :stroke-width="2.4" />
+              </span>
+              <h3>You're on the guest list</h3>
+              <p>
+                Thanks {{ form.name.split(" ")[0] }} — your pass is reserved. Keep this
+                QR code with you for the gate.
+              </p>
+            </div>
+          </div>
+
+          <form v-else class="form-card" novalidate @submit.prevent="submit">
+            <div class="form-head">
+              <button class="back" type="button" aria-label="Back" @click="step = 'welcome'">
+                <AppIcon name="arrow-left" :size="17" />
+              </button>
+              <div>
+                <h3>Reserve your guest pass</h3>
+                <p>Tell us a little about you so we can prepare your access.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="guest-name">Full name</label>
+              <div class="input-wrap" :class="{ invalid: errors.name }">
+                <span class="input-icon"><AppIcon name="user" :size="15" /></span>
+                <input
+                  id="guest-name"
+                  v-model="form.name"
+                  type="text"
+                  autocomplete="name"
+                  placeholder="Enter your full name"
+                  @input="errors.name = ''"
+                />
+              </div>
+              <p v-if="errors.name" class="field-error">{{ errors.name }}</p>
+            </div>
+
+            <div class="field">
+              <label for="guest-phone">Phone number</label>
+              <div class="input-wrap" :class="{ invalid: errors.phone }">
+                <span class="input-icon"><AppIcon name="phone" :size="15" /></span>
+                <input
+                  id="guest-phone"
+                  v-model="form.phone"
+                  type="tel"
+                  inputmode="tel"
+                  autocomplete="tel"
+                  placeholder="Enter your phone number"
+                  @input="errors.phone = ''"
+                />
+              </div>
+              <p v-if="errors.phone" class="field-error">{{ errors.phone }}</p>
+            </div>
+
+            <div class="field">
+              <label>I'm joining as</label>
+              <div class="roles" :class="{ invalid: errors.role }">
+                <button
+                  v-for="role in ROLES"
+                  :key="role.value"
+                  type="button"
+                  class="role"
+                  :class="{ active: form.role === role.value }"
+                  :aria-pressed="form.role === role.value"
+                  @click="pickRole(role.value)"
+                >
+                  <span v-if="form.role === role.value" class="role-check">
+                    <AppIcon name="check" :size="9" :stroke-width="3.4" />
+                  </span>
+                  <AppIcon :name="role.icon" :size="21" />
+                  <span class="role-label">{{ role.value }}</span>
+                </button>
+              </div>
+              <p v-if="errors.role" class="field-error">{{ errors.role }}</p>
+            </div>
+
+            <div class="field">
+              <label for="guest-company">
+                Company / Organization <span class="optional">(optional)</span>
+              </label>
+              <div class="input-wrap">
+                <span class="input-icon"><AppIcon name="building" :size="15" /></span>
+                <input
+                  id="guest-company"
+                  v-model="form.company"
+                  type="text"
+                  autocomplete="organization"
+                  placeholder="Enter your company"
+                />
+              </div>
+            </div>
+
+            <p v-if="error" class="form-error">{{ error }}</p>
+
+            <button class="submit" type="submit" :disabled="submitting">
+              <span v-if="submitting" class="spinner"></span>
+              <AppIcon v-else name="ticket" :size="18" />
+              {{ submitting ? "Reserving your pass…" : "Confirm & Get My Pass" }}
+            </button>
+
+            <p class="privacy">
+              <AppIcon name="lock" :size="12" />
+              Your information is used only for event registration.
+            </p>
+          </form>
+        </section>
+      </Transition>
     </div>
   </div>
 </template>
@@ -210,14 +220,17 @@ const ROLES = [
 ];
 
 const PERKS = [
-  { icon: "shield", title: "Exclusive Access", text: "Be part of the official ChiNet Launch" },
-  { icon: "star", title: "Product Demos", text: "See the next generation in action" },
-  { icon: "users", title: "VIP Networking", text: "Connect with industry leaders" },
-  { icon: "gift", title: "Priority Benefits", text: "Early access and special offers" },
+  { icon: "shield", title: "Exclusive Access" },
+  { icon: "star", title: "Product Demos" },
+  { icon: "users", title: "VIP Networking" },
+  { icon: "gift", title: "Priority Benefits" },
 ];
 
 /** Ethiopian Science Museum, Addis Ababa (9.0214518, 38.7624086) */
 const MAP_URL = "https://maps.app.goo.gl/1uPKfZMXKpbJU6yy7";
+
+/** Which of the two viewport-sized screens is showing */
+const step = ref("welcome");
 
 /** Pass token: from the parent (scan flow), the route, or ?token= */
 const passToken = computed(
@@ -310,12 +323,19 @@ const submit = async () => {
 </script>
 
 <style scoped>
+/*
+ * Both screens are sized to the viewport so a guest never has to scroll.
+ * The page still *allows* scrolling rather than clipping: when the phone
+ * keyboard opens it shrinks the viewport, and a hard overflow:hidden would
+ * put the field being typed in out of reach.
+ */
 .page {
   position: relative;
+  display: flex;
   min-height: 100vh;
-  overflow: hidden;
-  padding: 28px 18px 40px;
-  /* stated here so the page keeps its type even outside the global stylesheet */
+  min-height: 100dvh;
+  padding: clamp(12px, 2.5vh, 26px) 16px;
+  overflow-x: hidden;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   background:
@@ -327,7 +347,7 @@ const submit = async () => {
 .bg-arc,
 .bg-glow,
 .bg-dots {
-  position: absolute;
+  position: fixed;
   pointer-events: none;
 }
 
@@ -341,7 +361,6 @@ const submit = async () => {
   transform: translateX(-50%);
   border-radius: 50%;
   border: 1px solid rgba(129, 140, 248, 0.22);
-  box-shadow: 0 0 90px rgba(99, 102, 241, 0.18) inset;
 }
 
 .bg-glow {
@@ -369,10 +388,35 @@ const submit = async () => {
 .shell {
   position: relative;
   z-index: 1;
+  display: flex;
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
+  max-width: 460px;
+  margin: auto;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(9px, 1.8vh, 18px);
+  width: 100%;
   text-align: center;
+}
+
+/* screen swap */
+.swap-enter-active,
+.swap-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.swap-enter-from {
+  opacity: 0;
+  transform: translateX(14px);
+}
+
+.swap-leave-to {
+  opacity: 0;
+  transform: translateX(-14px);
 }
 
 /* --- brand --- */
@@ -380,18 +424,17 @@ const submit = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
 }
 
 .brand-mark {
-  /* size lives on the component's `height` prop, this only sets the colour */
   color: #f8fafc;
 }
 
 .brand-name {
   margin: 0;
   font-family: "Outfit", "Inter", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.19em;
   text-transform: uppercase;
@@ -400,13 +443,12 @@ const submit = async () => {
 
 /* --- hero --- */
 .pill {
-  display: inline-block;
-  margin: 22px 0 18px;
-  padding: 7px 16px;
+  align-self: center;
+  padding: 6px 15px;
   border-radius: 999px;
   border: 1px solid rgba(129, 140, 248, 0.35);
   background: rgba(99, 102, 241, 0.14);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -416,9 +458,9 @@ const submit = async () => {
 .title {
   margin: 0;
   font-family: "Playfair Display", "Outfit", Georgia, serif;
-  font-size: clamp(33px, 9.5vw, 46px);
+  font-size: clamp(28px, 8.6vw, 42px);
   font-weight: 700;
-  line-height: 1.14;
+  line-height: 1.12;
   letter-spacing: -0.01em;
   color: #f8fafc;
 }
@@ -429,19 +471,17 @@ const submit = async () => {
 
 .tagline {
   max-width: 34ch;
-  margin: 14px auto 0;
-  font-size: 14px;
-  line-height: 1.5;
+  margin: 0 auto;
+  font-size: clamp(12.5px, 3.5vw, 14px);
+  line-height: 1.45;
   color: #94a3b8;
-  text-wrap: balance;
 }
 
 /* --- event facts --- */
 .facts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  margin-top: 26px;
-  border-radius: 16px;
+  border-radius: 15px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(17, 24, 45, 0.6);
   overflow: hidden;
@@ -449,9 +489,10 @@ const submit = async () => {
 
 .fact {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 11px 10px;
   text-align: left;
   border: none;
   background: none;
@@ -464,20 +505,15 @@ const submit = async () => {
 
 .fact-link {
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.fact-link:hover {
-  background: rgba(99, 102, 241, 0.1);
 }
 
 .fact-icon {
   display: grid;
   place-items: center;
   flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 27px;
+  height: 27px;
+  border-radius: 9px;
   background: rgba(99, 102, 241, 0.16);
   color: #a5b4fc;
 }
@@ -486,27 +522,91 @@ const submit = async () => {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .fact-text strong {
-  font-size: 11.5px;
+  font-size: 10.5px;
   font-weight: 600;
   color: #e2e8f0;
 }
 
 .fact-text span {
-  font-size: 11.5px;
+  font-size: 10.5px;
   color: #8a93a8;
 }
 
-/* --- registration card --- */
-.form-card {
-  margin-top: 18px;
-  padding: 22px 20px;
-  border-radius: 20px;
+/* --- start button / locked notice --- */
+.start {
+  margin-top: 2px;
+}
+
+.locked {
+  padding: 14px 16px;
+  border-radius: 15px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(13, 19, 38, 0.75);
+  background: rgba(13, 19, 38, 0.7);
+}
+
+.locked h3 {
+  margin: 0 0 6px;
+  font-family: "Playfair Display", "Outfit", Georgia, serif;
+  font-size: 17px;
+  color: #f8fafc;
+}
+
+.locked p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
+.staff-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 11px;
+  color: #6b7a99;
+  text-decoration: none;
+}
+
+.staff-link:hover {
+  color: #a5b4fc;
+}
+
+/* --- perks strip --- */
+.perks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perks li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #818cf8;
+  text-align: center;
+}
+
+.foot {
+  font-size: 10px;
+  color: #5a6478;
+}
+
+/* --- form --- */
+.form-card {
+  padding: 18px 16px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(13, 19, 38, 0.78);
   backdrop-filter: blur(14px);
   box-shadow: 0 24px 50px rgba(4, 6, 16, 0.5);
   text-align: left;
@@ -515,43 +615,50 @@ const submit = async () => {
 .form-head {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 22px;
+  gap: 11px;
+  margin-bottom: clamp(12px, 2vh, 18px);
 }
 
-.form-head-icon {
+.back {
   display: grid;
   place-items: center;
   flex: none;
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
-  background: rgba(99, 102, 241, 0.16);
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(99, 102, 241, 0.14);
   color: #a5b4fc;
+  cursor: pointer;
+}
+
+.back:hover {
+  background: rgba(99, 102, 241, 0.24);
 }
 
 .form-head h3 {
-  margin: 0 0 3px;
+  margin: 0 0 2px;
   font-family: "Playfair Display", "Outfit", Georgia, serif;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
   color: #f8fafc;
 }
 
 .form-head p {
   margin: 0;
-  font-size: 11.5px;
+  font-size: 11px;
+  line-height: 1.35;
   color: #8a93a8;
 }
 
 .field {
-  margin-bottom: 16px;
+  margin-bottom: clamp(9px, 1.6vh, 14px);
 }
 
 .field label {
   display: block;
-  margin-bottom: 7px;
-  font-size: 11.5px;
+  margin-bottom: 6px;
+  font-size: 11px;
   font-weight: 600;
   color: #cbd5e1;
 }
@@ -569,7 +676,7 @@ const submit = async () => {
 
 .input-icon {
   position: absolute;
-  left: 14px;
+  left: 13px;
   display: grid;
   place-items: center;
   color: #6b7a99;
@@ -578,18 +685,20 @@ const submit = async () => {
 
 .input-wrap input {
   width: 100%;
-  padding: 13px 14px 13px 40px;
-  border-radius: 11px;
+  padding: 11px 13px 11px 36px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.09);
   background: rgba(8, 12, 26, 0.7);
   color: #f1f5f9;
   font-family: inherit;
-  font-size: 14px;
+  /* 16px keeps iOS Safari from zooming in when the field is focused */
+  font-size: 16px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-wrap input::placeholder {
+  font-size: 14px;
   color: #5f6b85;
 }
 
@@ -603,8 +712,8 @@ const submit = async () => {
 }
 
 .field-error {
-  margin: 7px 0 0;
-  font-size: 11px;
+  margin: 5px 0 0;
+  font-size: 10.5px;
   color: #f87171;
 }
 
@@ -612,7 +721,7 @@ const submit = async () => {
 .roles {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 9px;
+  gap: 6px;
 }
 
 .role {
@@ -620,9 +729,9 @@ const submit = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 9px;
-  padding: 16px 4px 13px;
-  border-radius: 14px;
+  gap: 6px;
+  padding: 10px 2px 8px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(8, 12, 26, 0.55);
   color: #94a3b8;
@@ -644,22 +753,22 @@ const submit = async () => {
 }
 
 .role-label {
-  font-size: 11.5px;
+  font-size: 9.5px;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
   text-align: center;
   /* room for a two-word role so every tile keeps the same height */
-  min-height: 2.5em;
+  min-height: 2.4em;
 }
 
 .role-check {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: -5px;
+  right: -5px;
   display: grid;
   place-items: center;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 2px solid #0d1326;
   background: #5b5bf5;
@@ -672,12 +781,12 @@ const submit = async () => {
 
 /* --- submit --- */
 .form-error {
-  margin: 0 0 14px;
-  padding: 11px 13px;
-  border-radius: 11px;
+  margin: 0 0 11px;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid rgba(248, 113, 113, 0.3);
   background: rgba(248, 113, 113, 0.1);
-  font-size: 12.5px;
+  font-size: 12px;
   color: #fca5a5;
 }
 
@@ -687,8 +796,7 @@ const submit = async () => {
   justify-content: center;
   gap: 9px;
   width: 100%;
-  margin-top: 6px;
-  padding: 15px;
+  padding: 14px;
   border: none;
   border-radius: 12px;
   background: linear-gradient(135deg, #6366f1, #4f46e5);
@@ -703,7 +811,6 @@ const submit = async () => {
 
 .submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.45);
 }
 
 .submit:disabled {
@@ -731,23 +838,23 @@ const submit = async () => {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin: 14px 0 0;
-  font-size: 11px;
+  margin: 11px 0 0;
+  font-size: 10px;
   color: #6b7a99;
 }
 
 /* --- success state --- */
 .done {
+  padding: 8px 4px;
   text-align: center;
-  padding: 12px 4px;
 }
 
 .done-icon {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 16px;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
   border-radius: 50%;
   background: rgba(52, 211, 153, 0.15);
   border: 1px solid rgba(52, 211, 153, 0.35);
@@ -757,129 +864,18 @@ const submit = async () => {
 .done h3 {
   margin: 0 0 8px;
   font-family: "Playfair Display", "Outfit", Georgia, serif;
-  font-size: 20px;
+  font-size: 19px;
   color: #f8fafc;
 }
 
 .done p {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12.5px;
+  line-height: 1.5;
   color: #94a3b8;
 }
 
-/* --- no pass to register against --- */
-.locked {
-  padding: 10px 4px;
-  text-align: center;
-}
-
-.locked-icon {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 15px;
-  border-radius: 50%;
-  border: 1px solid rgba(99, 102, 241, 0.35);
-  background: rgba(99, 102, 241, 0.14);
-  color: #a5b4fc;
-}
-
-.locked h3 {
-  margin: 0 0 8px;
-  font-family: "Playfair Display", "Outfit", Georgia, serif;
-  font-size: 19px;
-  color: #f8fafc;
-}
-
-.locked p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.55;
-  color: #94a3b8;
-}
-
-.staff-link {
-  display: inline-block;
-  margin-top: 16px;
-  font-size: 11.5px;
-  color: #6b7a99;
-  text-decoration: none;
-}
-
-.staff-link:hover {
-  color: #a5b4fc;
-}
-
-/* --- perks --- */
-.perks {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-top: 18px;
-  padding: 18px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(13, 19, 38, 0.55);
-  text-align: left;
-}
-
-.perk {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: #818cf8;
-}
-
-.perk strong {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #e2e8f0;
-}
-
-.perk span {
-  font-size: 10.5px;
-  line-height: 1.4;
-  color: #7c879e;
-}
-
-.foot {
-  margin-top: 22px;
-  font-size: 11px;
-  color: #5a6478;
-}
-
-/* --- narrow phones: keep the three facts side by side, just tighter --- */
-@media (max-width: 520px) {
-  .fact {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 13px 10px;
-  }
-
-  .fact-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 9px;
-  }
-
-  .fact-text strong,
-  .fact-text span {
-    font-size: 10.5px;
-  }
-
-  .perks {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* five tiles are too narrow on a phone, so they run three then two */
-  .roles {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
+/* --- very narrow phones --- */
 @media (max-width: 340px) {
   .facts {
     grid-template-columns: 1fr;
@@ -891,7 +887,7 @@ const submit = async () => {
   }
 
   .roles {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 </style>
