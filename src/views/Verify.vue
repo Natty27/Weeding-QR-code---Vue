@@ -242,7 +242,7 @@ onMounted(async () => {
   justify-content: center;
   padding: clamp(12px, 2.4vh, 20px) 16px;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: radial-gradient(circle at 50% 20%, #1E1B4B 0%, #090D16 80%);
+  background: radial-gradient(circle at 50% 20%, var(--bg-top) 0%, var(--bg-deep) 80%);
 }
 
 .card {
@@ -267,9 +267,9 @@ onMounted(async () => {
 }
 
 .icon-valid {
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.35);
-  color: #818cf8;
+  background: rgb(var(--tint-rgb) / 0.17);
+  border: 1px solid rgb(var(--tint-rgb) / 0.40);
+  color: var(--primary-text);
 }
 
 .icon-claimed {
@@ -297,7 +297,7 @@ onMounted(async () => {
 .badge-press { background: rgba(236, 72, 153, 0.2); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.4); }
 .badge-speaker { background: rgba(168, 85, 247, 0.2); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.4); }
 .badge-team { background: rgba(14, 165, 233, 0.2); color: #38BDF8; border: 1px solid rgba(14, 165, 233, 0.4); }
-.badge-standard { background: rgba(99, 102, 241, 0.2); color: #818CF8; border: 1px solid rgba(99, 102, 241, 0.4); }
+.badge-standard { background: rgb(var(--tint-rgb) / 0.23); color: var(--primary-text); border: 1px solid rgb(var(--tint-rgb) / 0.46); }
 
 .card h1 {
   font-size: 22px;
@@ -309,7 +309,7 @@ onMounted(async () => {
 .name {
   font-size: 20px;
   font-weight: 700;
-  color: #818CF8;
+  color: var(--primary-text);
   margin-bottom: 8px;
 }
 
@@ -353,10 +353,10 @@ onMounted(async () => {
   width: 100%;
   margin-bottom: 12px;
   padding: 12px;
-  border: 1px solid rgba(99, 102, 241, 0.4);
+  border: 1px solid rgb(var(--tint-rgb) / 0.46);
   border-radius: 11px;
-  background: rgba(99, 102, 241, 0.16);
-  color: #c7d2fe;
+  background: rgb(var(--tint-rgb) / 0.18);
+  color: var(--primary-pale);
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -365,7 +365,7 @@ onMounted(async () => {
 }
 
 .download:hover:not(:disabled) {
-  background: rgba(99, 102, 241, 0.28);
+  background: rgb(var(--tint-rgb) / 0.32);
   transform: translateY(-1px);
 }
 
@@ -379,7 +379,7 @@ onMounted(async () => {
   height: 15px;
   margin: 0;
   border-width: 2px;
-  border-top-color: #c7d2fe;
+  border-top-color: var(--primary-pale);
 }
 
 .status {
@@ -399,9 +399,9 @@ onMounted(async () => {
 }
 
 .status.claimed {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818CF8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgb(var(--tint-rgb) / 0.17);
+  color: var(--primary-text);
+  border: 1px solid rgb(var(--tint-rgb) / 0.34);
 }
 
 .notice {
@@ -429,8 +429,8 @@ onMounted(async () => {
 .spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid rgba(99, 102, 241, 0.2);
-  border-top-color: #6366F1;
+  border: 3px solid rgb(var(--tint-rgb) / 0.23);
+  border-top-color: var(--primary);
   border-radius: 50%;
   margin: 0 auto 16px;
   animation: spin 0.8s linear infinite;

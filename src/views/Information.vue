@@ -304,7 +304,7 @@ const submit = async () => {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   background:
-    radial-gradient(120% 70% at 50% -10%, #1b1a4d 0%, transparent 60%),
+    radial-gradient(120% 70% at 50% -10%, var(--bg-top) 0%, transparent 60%),
     linear-gradient(180deg, #0b0f24 0%, #080b18 100%);
 }
 
@@ -325,7 +325,7 @@ const submit = async () => {
   max-height: 900px;
   transform: translateX(-50%);
   border-radius: 50%;
-  border: 1px solid rgba(129, 140, 248, 0.22);
+  border: 1px solid rgb(var(--tint-rgb) / 0.25);
 }
 
 .bg-glow {
@@ -334,7 +334,7 @@ const submit = async () => {
   width: 460px;
   height: 460px;
   transform: translateX(-60%);
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 65%);
+  background: radial-gradient(circle, rgb(var(--primary-rgb) / 0.42) 0%, transparent 65%);
   filter: blur(10px);
 }
 
@@ -395,13 +395,13 @@ const submit = async () => {
   align-self: center;
   padding: 5px 13px;
   border-radius: 999px;
-  border: 1px solid rgba(129, 140, 248, 0.35);
-  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgb(var(--tint-rgb) / 0.40);
+  background: rgb(var(--tint-rgb) / 0.16);
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #c7d2fe;
+  color: var(--primary-pale);
 }
 
 .title {
@@ -415,7 +415,7 @@ const submit = async () => {
 }
 
 .title span {
-  color: #6366f1;
+  color: var(--primary-text);
 }
 
 .tagline {
@@ -462,8 +462,8 @@ const submit = async () => {
   width: 25px;
   height: 25px;
   border-radius: 8px;
-  background: rgba(99, 102, 241, 0.16);
-  color: #a5b4fc;
+  background: rgb(var(--tint-rgb) / 0.18);
+  color: var(--primary-soft);
 }
 
 .fact-text {
@@ -515,7 +515,7 @@ const submit = async () => {
 }
 
 .staff-link:hover {
-  color: #a5b4fc;
+  color: var(--primary-soft);
 }
 
 /* --- form --- */
@@ -590,8 +590,8 @@ const submit = async () => {
 }
 
 .input-wrap input:focus {
-  border-color: rgba(99, 102, 241, 0.7);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: rgb(var(--tint-rgb) / 0.80);
+  box-shadow: 0 0 0 3px rgb(var(--tint-rgb) / 0.17);
 }
 
 .input-wrap.invalid input {
@@ -622,15 +622,15 @@ const submit = async () => {
 }
 
 .role:hover {
-  border-color: rgba(129, 140, 248, 0.4);
+  border-color: rgb(var(--tint-rgb) / 0.46);
   color: #cbd5e1;
 }
 
 .role.active {
-  border-color: #5b5bf5;
-  background: rgba(91, 91, 245, 0.14);
+  border-color: var(--primary);
+  background: rgb(var(--tint-rgb) / 0.16);
   color: #f8fafc;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 3px rgb(var(--tint-rgb) / 0.14);
 }
 
 .role-label {
@@ -652,7 +652,7 @@ const submit = async () => {
   height: 14px;
   border-radius: 50%;
   border: 2px solid #0d1326;
-  background: #5b5bf5;
+  background: var(--primary);
   color: #fff;
 }
 
@@ -683,13 +683,13 @@ const submit = async () => {
   padding: 12px;
   border: none;
   border-radius: 11px;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
   color: #fff;
   font-family: inherit;
   font-size: 14.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 10px 22px rgb(var(--primary-rgb) / 0.45);
   transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
 }
 

@@ -12,16 +12,26 @@ const W = 1000;
 const H = 1460;
 const PAD = 70;
 
-const INK = {
-  bg0: "#141546",
-  bg1: "#080b18",
-  edge: "rgba(148, 163, 255, 0.28)",
+/** Canvas cannot use CSS variables, so the palette is read off :root once */
+const cssVar = (name, fallback) => {
+  if (typeof document === "undefined") return fallback;
+
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+
+  return value || fallback;
+};
+
+const palette = () => ({
+  bg0: cssVar("--bg-top", "#101a55"),
+  bg1: cssVar("--bg-deep", "#080b18"),
   white: "#f8fafc",
-  brand: "#a5b4fc",
+  brand: cssVar("--primary-soft", "#9fa0ff"),
   muted: "#94a3b8",
   faint: "#6b7a99",
-  accent: "#6366f1",
-};
+  glow: cssVar("--primary-rgb", "0 0 255"),
+});
 
 const loadImage = (src) =>
   new Promise((resolve, reject) => {
@@ -86,6 +96,7 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   canvas.height = H;
 
   const ctx = canvas.getContext("2d");
+  const ink = palette();
 
   // the page's webfonts must be loaded before canvas can use them
   if (document.fonts?.ready) {
@@ -99,21 +110,21 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   // background
   const bg = ctx.createLinearGradient(0, 0, 0, H);
 
-  bg.addColorStop(0, INK.bg0);
-  bg.addColorStop(1, INK.bg1);
+  bg.addColorStop(0, ink.bg0);
+  bg.addColorStop(1, ink.bg1);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
   // a soft glow behind the title, echoing the invitation page
   const glow = ctx.createRadialGradient(W / 2, 40, 0, W / 2, 40, 620);
 
-  glow.addColorStop(0, "rgba(99, 102, 241, 0.38)");
-  glow.addColorStop(1, "rgba(99, 102, 241, 0)");
+  glow.addColorStop(0, `rgb(${ink.glow} / 0.5)`);
+  glow.addColorStop(1, `rgb(${ink.glow} / 0)`);
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, 700);
 
   // hairline frame
-  ctx.strokeStyle = INK.edge;
+  ctx.strokeStyle = "rgba(148, 163, 255, 0.28)";
   ctx.lineWidth = 2;
   roundRect(ctx, 22, 22, W - 44, H - 44, 34);
   ctx.stroke();
@@ -123,7 +134,7 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   // brand mark
   try {
     const markHeight = 104;
-    const mark = await loadImage(markDataUrl(markHeight, INK.white));
+    const mark = await loadImage(markDataUrl(markHeight, ink.white));
 
     ctx.drawImage(mark, (W - mark.width) / 2, y, mark.width, markHeight);
     y += markHeight + 52;
@@ -134,14 +145,14 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
 
   centreText(ctx, EVENT.brand.toUpperCase(), y, {
     font: '700 26px Outfit, Inter, system-ui, sans-serif',
-    color: INK.white,
+    color: ink.white,
     spacing: 9,
   });
   y += 78;
 
   centreText(ctx, EVENT.title, y, {
     font: '700 82px "Playfair Display", Georgia, serif',
-    color: INK.white,
+    color: ink.white,
   });
   y += 40;
 
@@ -151,15 +162,15 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   ctx.font = '700 24px Inter, system-ui, sans-serif';
   const chipWidth = ctx.measureText(chip).width + 44;
 
-  ctx.fillStyle = "rgba(99, 102, 241, 0.18)";
+  ctx.fillStyle = `rgb(${ink.glow} / 0.28)`;
   roundRect(ctx, (W - chipWidth) / 2, y, chipWidth, 46, 23);
   ctx.fill();
-  ctx.strokeStyle = "rgba(129, 140, 248, 0.5)";
+  ctx.strokeStyle = "rgba(140, 140, 255, 0.55)";
   ctx.lineWidth = 1.5;
   ctx.stroke();
   centreText(ctx, chip, y + 31, {
     font: '700 24px Inter, system-ui, sans-serif',
-    color: INK.brand,
+    color: ink.brand,
     spacing: 2,
   });
   y += 46 + 62;
@@ -167,14 +178,14 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   // who the pass belongs to
   centreText(ctx, name || "Event Attendee", y, {
     font: '700 44px Inter, system-ui, sans-serif',
-    color: INK.white,
+    color: ink.white,
   });
   y += org ? 44 : 22;
 
   if (org) {
     centreText(ctx, org, y, {
       font: '400 26px Inter, system-ui, sans-serif',
-      color: INK.muted,
+      color: ink.muted,
     });
     y += 26;
   }
@@ -192,13 +203,13 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   // when and where
   centreText(ctx, `${EVENT.dateLong}  ·  ${EVENT.time}`, y, {
     font: '600 30px Inter, system-ui, sans-serif',
-    color: INK.white,
+    color: ink.white,
   });
   y += 44;
 
   centreText(ctx, EVENT.venueLong, y, {
     font: '400 28px Inter, system-ui, sans-serif',
-    color: INK.muted,
+    color: ink.muted,
   });
 
   // QR at the bottom, on white so it always scans
@@ -226,7 +237,7 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
 
   centreText(ctx, "Present this pass at the gate for check-in", H - PAD - 18, {
     font: '400 24px Inter, system-ui, sans-serif',
-    color: INK.faint,
+    color: ink.faint,
   });
 
   return new Promise((resolve, reject) => {

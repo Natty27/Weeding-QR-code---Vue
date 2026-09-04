@@ -100,7 +100,7 @@ const submit = async () => {
   padding: 24px 18px;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   background:
-    radial-gradient(120% 70% at 50% -10%, #1b1a4d 0%, transparent 60%),
+    radial-gradient(120% 70% at 50% -10%, var(--bg-top) 0%, transparent 60%),
     linear-gradient(180deg, #0b0f24 0%, #080b18 100%);
 }
 
@@ -111,7 +111,7 @@ const submit = async () => {
   width: 420px;
   height: 420px;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 65%);
+  background: radial-gradient(circle, rgb(var(--primary-rgb) / 0.38) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -189,8 +189,8 @@ input::placeholder {
 }
 
 input:focus {
-  border-color: rgba(99, 102, 241, 0.7);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: rgb(var(--tint-rgb) / 0.80);
+  box-shadow: 0 0 0 3px rgb(var(--tint-rgb) / 0.17);
 }
 
 .error {
@@ -213,13 +213,13 @@ input:focus {
   padding: 14px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
   color: #fff;
   font-family: inherit;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 12px 26px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 12px 26px rgb(var(--primary-rgb) / 0.45);
   transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
 }
 
@@ -265,6 +265,6 @@ input:focus {
 }
 
 .back:hover {
-  color: #a5b4fc;
+  color: var(--primary-soft);
 }
 </style>

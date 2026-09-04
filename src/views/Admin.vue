@@ -300,9 +300,9 @@ onMounted(load);
   display: inline-block;
   padding: 6px 14px;
   border-radius: 20px;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.4);
-  color: #818CF8;
+  background: rgb(var(--tint-rgb) / 0.17);
+  border: 1px solid rgb(var(--tint-rgb) / 0.46);
+  color: var(--primary-text);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -317,7 +317,7 @@ onMounted(load);
 .hero h1 {
   font-size: 38px;
   font-weight: 800;
-  background: linear-gradient(135deg, #FFFFFF, #818CF8);
+  background: linear-gradient(135deg, #FFFFFF, var(--primary-text));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 8px;
@@ -376,18 +376,18 @@ onMounted(load);
 .download-all.primary {
   padding: 14px 28px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #6366F1, #4F46E5);
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
   color: white;
   font-weight: 700;
   border: none;
   cursor: pointer;
-  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 10px 25px rgb(var(--tint-rgb) / 0.40);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .download-all.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 15px 30px rgb(var(--tint-rgb) / 0.57);
 }
 
 .btn-secondary {
@@ -469,7 +469,7 @@ onMounted(load);
 }
 
 .select-input:focus, .text-input:focus, .input-group input:focus {
-  border-color: #6366F1;
+  border-color: var(--primary);
 }
 
 .input-group {
@@ -480,7 +480,7 @@ onMounted(load);
 .btn-action {
   padding: 12px 20px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #6366F1, #4F46E5);
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
   color: white;
   font-weight: 700;
   border: none;
@@ -521,7 +521,7 @@ onMounted(load);
 
 .guest-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: rgb(var(--tint-rgb) / 0.46);
 }
 
 .guest-card.used {
@@ -548,7 +548,7 @@ onMounted(load);
 .badge-press { background: rgba(236, 72, 153, 0.2); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.4); }
 .badge-speaker { background: rgba(168, 85, 247, 0.2); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.4); }
 .badge-team { background: rgba(14, 165, 233, 0.2); color: #38BDF8; border: 1px solid rgba(14, 165, 233, 0.4); }
-.badge-standard { background: rgba(99, 102, 241, 0.2); color: #818CF8; border: 1px solid rgba(99, 102, 241, 0.4); }
+.badge-standard { background: rgb(var(--tint-rgb) / 0.23); color: var(--primary-text); border: 1px solid rgb(var(--tint-rgb) / 0.46); }
 
 .status-indicator {
   font-size: 9px;
@@ -612,8 +612,8 @@ onMounted(load);
 .loader-spinner {
   width: 44px;
   height: 44px;
-  border: 4px solid rgba(99, 102, 241, 0.2);
-  border-top-color: #6366F1;
+  border: 4px solid rgb(var(--tint-rgb) / 0.23);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

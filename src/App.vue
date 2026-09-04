@@ -70,6 +70,6 @@ const showNav = computed(() => ["Admin", "AdminPage"].includes(route.name));
 
 .nav-item:hover, .nav-item.router-link-active {
   color: #F8FAFC;
-  background: rgba(99, 102, 241, 0.2);
+  background: rgb(var(--tint-rgb) / 0.23);
 }
 </style>

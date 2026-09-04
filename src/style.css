@@ -1,11 +1,27 @@
 :root {
+  /*
+   * Brand palette. --primary is the pure brand blue and belongs on fills:
+   * at ~2:1 against the dark background it is unreadable as text, so accent
+   * text uses the lighter tints below (5.3:1 and up), and soft washes use
+   * --tint-rgb so they stay visibly blue rather than near-black.
+   */
+  --primary: #0000ff;
+  --primary-deep: #0000c8;
+  --primary-rgb: 0 0 255;
+  --tint-rgb: 92 92 255;
+  --primary-text: #7d7dff;
+  --primary-soft: #9fa0ff;
+  --primary-pale: #c9caff;
+  --bg-top: #101a55;
+  --bg-deep: #080b18;
+
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: dark;
   color: #F8FAFC;
-  background-color: #090D16;
+  background-color: var(--bg-deep);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,7 +39,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: radial-gradient(circle at 50% -20%, #1E1B4B 0%, #090D16 70%);
+  background: radial-gradient(circle at 50% -20%, var(--bg-top) 0%, var(--bg-deep) 70%);
   background-attachment: fixed;
   color: #F8FAFC;
 }
