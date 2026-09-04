@@ -23,6 +23,10 @@
 
       <p v-if="error" class="error">{{ error }}</p>
 
+      <!-- which backend this page signs in to: the two environments have
+           different passwords, so it matters which one answered -->
+      <p class="target">Signing in to {{ apiHost }}</p>
+
       <button class="submit" type="submit" :disabled="busy">
         <span v-if="busy" class="spinner"></span>
         {{ busy ? "Checking…" : "Sign in" }}
@@ -37,6 +41,7 @@
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import api from "../services/api";
+import { BACKEND_BASE_URL } from "../config";
 import { setStaffKey } from "../services/auth";
 import AppIcon from "@/components/AppIcon.vue";
 import ChinetMark from "@/components/ChinetMark.vue";
@@ -48,6 +53,9 @@ const field = ref(null);
 const key = ref("");
 const error = ref("");
 const busy = ref(false);
+
+/** Host of the API this page talks to, shown so the environment is never a guess */
+const apiHost = BACKEND_BASE_URL.replace(/^https?:\/\//, "");
 
 onMounted(() => field.value?.focus());
 
@@ -66,9 +74,15 @@ const submit = async () => {
     setStaffKey(key.value);
     router.replace(route.query.redirect || "/admin");
   } catch (e) {
-    error.value =
-      e.response?.data?.message ||
-      "Could not reach the server. Check your connection and try again.";
+    if (!e.response) {
+      error.value = `Could not reach the API at ${apiHost}. Check your connection and try again.`;
+    } else if (e.response.status === 503) {
+      // no ADMIN_KEY on whichever API answered - name it, since the wrong
+      // environment answering is the usual cause
+      error.value = `${e.response.data?.message || "Staff sign-in is not configured"} — the API that answered was ${apiHost}.`;
+    } else {
+      error.value = e.response.data?.message || "Sign-in failed. Please try again.";
+    }
   } finally {
     busy.value = false;
   }
@@ -231,6 +245,14 @@ input:focus {
   to {
     transform: rotate(360deg);
   }
+}
+
+.target {
+  margin: 12px 0 0;
+  font-size: 10.5px;
+  color: #5a6478;
+  text-align: center;
+  word-break: break-all;
 }
 
 .back {
