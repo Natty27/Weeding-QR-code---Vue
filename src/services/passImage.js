@@ -23,15 +23,33 @@ const cssVar = (name, fallback) => {
   return value || fallback;
 };
 
-const palette = () => ({
-  bg0: cssVar("--bg-top", "#101a55"),
-  bg1: cssVar("--bg-deep", "#080b18"),
-  white: "#f8fafc",
-  brand: cssVar("--primary-soft", "#9fa0ff"),
-  muted: "#94a3b8",
-  faint: "#6b7a99",
-  glow: cssVar("--primary-rgb", "0 0 255"),
-});
+/** Special guests get a gold card so their invitation is unmistakable */
+export const SPECIAL_GUEST = "Special Guest";
+
+const palette = (special) =>
+  special
+    ? {
+        bg0: "#3a2b07",
+        bg1: "#0c0a04",
+        white: "#fffaf0",
+        brand: "#f7dfa1",
+        muted: "#cbb68c",
+        faint: "#9d8a5f",
+        glow: "212 160 23",
+        line: "rgba(233, 189, 74, 0.55)",
+        rule: "rgba(233, 189, 74, 0.35)",
+      }
+    : {
+        bg0: cssVar("--bg-top", "#101a55"),
+        bg1: cssVar("--bg-deep", "#080b18"),
+        white: "#f8fafc",
+        brand: cssVar("--primary-soft", "#9fa0ff"),
+        muted: "#94a3b8",
+        faint: "#6b7a99",
+        glow: cssVar("--primary-rgb", "0 0 255"),
+        line: "rgba(148, 163, 255, 0.28)",
+        rule: "rgba(148, 163, 255, 0.2)",
+      };
 
 /** the mark is identical on every card, so it is fetched once per session */
 const imageCache = new Map();
@@ -123,7 +141,7 @@ export const composePassImage = async ({
   canvas.height = H;
 
   const ctx = canvas.getContext("2d");
-  const ink = palette();
+  const ink = palette(ticketType === SPECIAL_GUEST);
 
   // the page's webfonts must be loaded before canvas can use them
   if (document.fonts?.ready) {
@@ -151,7 +169,7 @@ export const composePassImage = async ({
   ctx.fillRect(0, 0, W, 700);
 
   // hairline frame
-  ctx.strokeStyle = "rgba(148, 163, 255, 0.28)";
+  ctx.strokeStyle = ink.line;
   ctx.lineWidth = 2;
   roundRect(ctx, 22, 22, W - 44, H - 44, 34);
   ctx.stroke();
@@ -194,7 +212,7 @@ export const composePassImage = async ({
   ctx.fillStyle = `rgb(${ink.glow} / 0.28)`;
   roundRect(ctx, (W - chipWidth) / 2, y, chipWidth, 46, 23);
   ctx.fill();
-  ctx.strokeStyle = "rgba(140, 140, 255, 0.55)";
+  ctx.strokeStyle = ink.line;
   ctx.lineWidth = 1.5;
   ctx.stroke();
   centreText(ctx, chip, y + 31, {
@@ -232,7 +250,7 @@ export const composePassImage = async ({
 
   // divider
   y += 34;
-  ctx.strokeStyle = "rgba(148, 163, 255, 0.2)";
+  ctx.strokeStyle = ink.rule;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(PAD + 60, y);

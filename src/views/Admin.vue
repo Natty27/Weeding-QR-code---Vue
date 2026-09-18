@@ -68,6 +68,7 @@
             <option value="Media/Press">Media & Press</option>
             <option value="Speaker">Keynote Speaker</option>
             <option value="Team">Launch Team</option>
+            <option value="Special Guest">Special Guest</option>
           </select>
         </div>
 
@@ -107,6 +108,7 @@
             <option value="Media/Press">Media & Press</option>
             <option value="Speaker">Keynote Speaker</option>
             <option value="Team">Launch Team</option>
+            <option value="Special Guest">Special Guest</option>
           </select>
         </div>
 
@@ -214,6 +216,7 @@ const getBadgeClass = (type) => {
     case 'Media/Press': return 'badge-press';
     case 'Speaker': return 'badge-speaker';
     case 'Team': return 'badge-team';
+    case 'Special Guest': return 'badge-special';
     default: return 'badge-standard';
   }
 };
@@ -656,6 +659,12 @@ onMounted(load);
 .badge-speaker { background: rgba(168, 85, 247, 0.2); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.4); }
 .badge-team { background: rgba(14, 165, 233, 0.2); color: #38BDF8; border: 1px solid rgba(14, 165, 233, 0.4); }
 .badge-standard { background: rgb(var(--tint-rgb) / 0.23); color: var(--primary-text); border: 1px solid rgb(var(--tint-rgb) / 0.46); }
+.badge-special {
+  background: rgba(212, 160, 23, 0.22);
+  color: #f5d98b;
+  border: 1px solid rgba(233, 189, 74, 0.6);
+  box-shadow: 0 0 12px rgba(212, 160, 23, 0.25);
+}
 
 .status-indicator {
   font-size: 9px;
