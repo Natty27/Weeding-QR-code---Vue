@@ -9,7 +9,7 @@
       <section class="screen">
         <!-- start-time note, shown while EVENT.notice is set -->
         <div v-if="EVENT.notice" class="alert" role="status">
-          <AppIcon name="clock" :size="15" />
+          <AppIcon name="clock" :size="18" :stroke-width="2" />
           <p>{{ EVENT.notice }}</p>
         </div>
 
@@ -377,22 +377,27 @@ const submit = async () => {
 /* --- correction banner --- */
 .alert {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 9px 12px;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
   border-radius: 12px;
-  border: 1px solid rgba(251, 191, 36, 0.38);
-  background: rgba(251, 191, 36, 0.12);
-  color: #fcd34d;
+  border: 1px solid rgba(248, 113, 113, 0.55);
+  background: rgba(220, 38, 38, 0.18);
+  color: #fca5a5;
   text-align: left;
 }
 
 .alert p {
   margin: 0;
-  font-size: 11.5px;
-  font-weight: 600;
+  /*
+   * Kefa ships on Apple devices only and cannot be served as a webfont, so
+   * everyone else gets Noto Sans Ethiopic, which is loaded with the page.
+   */
+  font-family: Kefa, "Noto Sans Ethiopic", "Inter", system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
   line-height: 1.4;
-  color: #fde68a;
+  color: #fecaca;
 }
 
 /* --- brand --- */
@@ -815,11 +820,11 @@ const submit = async () => {
   }
 
   .alert {
-    padding: 7px 10px;
+    padding: 9px 11px;
   }
 
   .alert p {
-    font-size: 10.5px;
+    font-size: 12.5px;
   }
 
   .title {
