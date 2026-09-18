@@ -7,6 +7,14 @@
 
     <div class="shell">
       <section class="screen">
+        <!-- correction banner, shown while EVENT.notice is set -->
+        <div v-if="EVENT.notice" class="alert" role="status">
+          <AppIcon name="alert" :size="15" />
+          <p>
+            <strong>{{ EVENT.notice.lead }}</strong> · {{ EVENT.notice.text }}
+          </p>
+        </div>
+
         <header class="brand">
           <ChinetMark class="brand-mark" :height="30" />
           <h2 class="brand-name">{{ EVENT.brand }}</h2>
@@ -366,6 +374,30 @@ const submit = async () => {
   gap: clamp(7px, 1.3vh, 15px);
   width: 100%;
   text-align: center;
+}
+
+/* --- correction banner --- */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.38);
+  background: rgba(251, 191, 36, 0.12);
+  color: #fcd34d;
+  text-align: left;
+}
+
+.alert p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.alert strong {
+  font-weight: 700;
+  color: #fde68a;
 }
 
 /* --- brand --- */
@@ -759,7 +791,7 @@ const submit = async () => {
  * Below roughly 620px of viewport height the form itself no longer fits, and
  * scrolling is the honest outcome - clipping the fields would be worse.
  */
-@media (max-height: 730px) {
+@media (max-height: 780px) {
   .tagline {
     display: none;
   }
@@ -767,11 +799,32 @@ const submit = async () => {
   .foot {
     display: none;
   }
+
+  /*
+   * The correction banner earns its space here: the badge repeats the date
+   * that the facts strip below already carries, so it goes instead.
+   */
+  .pill {
+    display: none;
+  }
 }
 
-@media (max-height: 690px) {
+@media (max-height: 700px) {
   .screen {
     gap: clamp(5px, 0.9vh, 11px);
+  }
+
+  /* the mark still carries the brand; the wordmark is what gives way */
+  .brand-name {
+    display: none;
+  }
+
+  .alert {
+    padding: 7px 10px;
+  }
+
+  .alert p {
+    font-size: 10.5px;
   }
 
   .title {
@@ -780,11 +833,11 @@ const submit = async () => {
   }
 
   .field {
-    margin-bottom: clamp(6px, 1vh, 9px);
+    margin-bottom: clamp(5px, 0.9vh, 8px);
   }
 
   .form-title {
-    margin-bottom: 9px;
+    margin-bottom: 8px;
     font-size: 16px;
   }
 }
