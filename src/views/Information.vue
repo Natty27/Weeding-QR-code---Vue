@@ -7,9 +7,9 @@
 
     <div class="shell">
       <section class="screen">
-        <!-- correction banner, shown while EVENT.notice is set -->
+        <!-- start-time note, shown while EVENT.notice is set -->
         <div v-if="EVENT.notice" class="alert" role="status">
-          <AppIcon name="alert" :size="15" />
+          <AppIcon name="clock" :size="15" />
           <p>
             <strong>{{ EVENT.notice.lead }}</strong> · {{ EVENT.notice.text }}
           </p>

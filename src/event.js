@@ -9,13 +9,14 @@ export const EVENT = {
   tagline: "You're invited to experience what's next in logistics.",
 
   /**
-   * Banner at the top of the registration page. Some printed passes went out
-   * with 11:00 PM on them; this is the correction guests see when they scan.
-   * Set to null once the passes are no longer in circulation.
+   * Banner at the top of the registration page. The printed passes give the
+   * start time in Ethiopian reckoning (11:00), which is 5:00 PM on the
+   * international clock shown elsewhere on the page - the same moment, not a
+   * mistake. Set to null to remove the banner.
    */
   notice: {
-    lead: "Starts 5:00 PM",
-    text: "Some printed passes show 11:00 PM in error.",
+    lead: "Starts 11:00 Ethiopian time",
+    text: "5:00 PM international — your printed pass is correct.",
   },
 
   /** short forms for the invitation's date/time/venue strip */
