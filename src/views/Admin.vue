@@ -142,18 +142,19 @@
           {{ g.name || `Attendee #${g.sequence}` }}
         </p>
 
+        <button
+          class="btn-invite"
+          :disabled="busyCard === g._id"
+          @click="downloadInvitation(g)"
+        >
+          <AppIcon v-if="busyCard !== g._id" name="download" :size="15" />
+          <span v-else class="spinner spinner-mini"></span>
+          {{ busyCard === g._id ? "Preparing…" : "Download digital invitation" }}
+        </button>
+
         <div class="card-footer">
           <span class="token">#{{ g.token ? g.token.slice(0, 8) : 'ACCESS' }}</span>
-          <div class="card-actions">
-            <button
-              class="btn-invite-mini"
-              :disabled="busyCard === g._id"
-              @click="downloadInvitation(g)"
-            >
-              {{ busyCard === g._id ? "…" : "Invitation" }}
-            </button>
-            <button v-if="g.used" class="btn-reset-mini" @click="resetGuest(g._id)">Reset</button>
-          </div>
+          <button v-if="g.used" class="btn-reset-mini" @click="resetGuest(g._id)">Reset</button>
         </div>
       </div>
     </transition-group>
@@ -169,6 +170,7 @@ import { clearStaffKey } from "../services/auth";
 import { passQrDataUrl, passUrl } from "../services/passQr";
 import { composePassImage } from "../services/passImage";
 import { createZip } from "../services/zip";
+import AppIcon from "@/components/AppIcon.vue";
 
 const router = useRouter();
 
@@ -692,30 +694,42 @@ onMounted(load);
   font-family: monospace;
 }
 
-.card-actions {
+.btn-invite {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.btn-invite-mini {
-  background: rgb(var(--tint-rgb) / 0.2);
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin: 12px 0 10px;
+  padding: 9px 10px;
   border: 1px solid rgb(var(--tint-rgb) / 0.45);
+  border-radius: 10px;
+  background: rgb(var(--tint-rgb) / 0.2);
   color: var(--primary-pale);
-  font-size: 10px;
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
 }
 
-.btn-invite-mini:hover:not(:disabled) {
+.btn-invite:hover:not(:disabled) {
   background: rgb(var(--tint-rgb) / 0.34);
+  transform: translateY(-1px);
 }
 
-.btn-invite-mini:disabled {
-  opacity: 0.6;
+.btn-invite:disabled {
+  opacity: 0.65;
   cursor: wait;
+}
+
+.spinner-mini {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgb(var(--tint-rgb) / 0.4);
+  border-top-color: var(--primary-pale);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 .btn-reset-mini {
