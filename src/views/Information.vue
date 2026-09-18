@@ -307,7 +307,7 @@ const submit = async () => {
   min-height: 100dvh;
   padding: clamp(10px, 1.8vh, 22px) 14px;
   overflow-x: hidden;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family: "Inter", "Noto Sans Ethiopic", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   background:
     radial-gradient(120% 70% at 50% -10%, var(--bg-top) 0%, transparent 60%),

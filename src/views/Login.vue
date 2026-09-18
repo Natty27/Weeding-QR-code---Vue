@@ -98,7 +98,7 @@ const submit = async () => {
   min-height: 100vh;
   overflow: hidden;
   padding: 24px 18px;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family: "Inter", "Noto Sans Ethiopic", system-ui, -apple-system, sans-serif;
   background:
     radial-gradient(120% 70% at 50% -10%, var(--bg-top) 0%, transparent 60%),
     linear-gradient(180deg, #0b0f24 0%, #080b18 100%);

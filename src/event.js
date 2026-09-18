@@ -14,7 +14,7 @@ export const EVENT = {
    * international clock shown elsewhere on the page - the same moment, not a
    * mistake. Set to null to remove the banner.
    */
-  notice: "The event starts at 11:00 Ethiopian time",
+  notice: "ዝግጅቱ የሚጀምረው በኢትዮጵያ የሰዓት አቆጣጠር ከምሽቱ 11 ሰዓት ነው።",
 
   /** short forms for the invitation's date/time/venue strip */
   dayShort: "Sat, Sep 19",

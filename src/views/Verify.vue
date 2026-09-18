@@ -232,7 +232,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   padding: clamp(12px, 2.4vh, 20px) 16px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', 'Noto Sans Ethiopic', system-ui, -apple-system, sans-serif;
   background: radial-gradient(circle at 50% 20%, var(--bg-top) 0%, var(--bg-deep) 80%);
 }
 
