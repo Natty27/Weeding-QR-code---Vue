@@ -73,8 +73,7 @@ import { useRoute } from "vue-router";
 import api from "../services/api";
 import Information from "./Information.vue";
 import AppIcon from "@/components/AppIcon.vue";
-import QRCode from "qrcode";
-import { FRONTEND_BASE_URL } from "../config";
+import { passQrDataUrl } from "../services/passQr";
 import { composePassImage } from "../services/passImage";
 
 const route = useRoute();
@@ -121,15 +120,7 @@ const buildQr = async () => {
   if (!token.value) return;
 
   try {
-    qrImage.value = await QRCode.toDataURL(
-      `${FRONTEND_BASE_URL}/guests/verify/${token.value}`,
-      {
-        width: 640,
-        margin: 2,
-        errorCorrectionLevel: "M",
-        color: { dark: "#0F172A", light: "#FFFFFF" },
-      },
-    );
+    qrImage.value = await passQrDataUrl(token.value);
   } catch {
     qrImage.value = "";
   }

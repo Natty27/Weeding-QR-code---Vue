@@ -23,8 +23,10 @@ export const EVENT = {
   venue: "Science Museum",
   city: "Addis Ababa",
 
-  /** long forms for the saved pass image */
+  /** long forms for the saved pass and invitation images */
   dateLong: "Saturday, 19 September 2026",
+  /** both clocks, because the printed invitations give the Ethiopian one */
+  timeBoth: "11:00 Ethiopian time  ·  5:00 PM",
   venueLong: "Science Museum, Addis Ababa",
 
   /** Ethiopian Science Museum, Addis Ababa (9.0214518, 38.7624086) */

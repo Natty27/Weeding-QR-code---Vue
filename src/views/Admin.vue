@@ -27,6 +27,17 @@
         <button class="download-all primary" @click="downloadZip">
           ⚡ Download All Access Passes (ZIP)
         </button>
+        <button
+          class="btn-secondary"
+          :disabled="bulk.running || !guests.length"
+          @click="downloadAllInvitations"
+        >
+          {{
+            bulk.running
+              ? `Building invitations… ${bulk.done}/${bulk.total}`
+              : "Download All Digital Invitations (ZIP)"
+          }}
+        </button>
         <button class="btn-secondary" @click="resetAll">
           🔄 Reset All Check-Ins
         </button>
@@ -133,7 +144,16 @@
 
         <div class="card-footer">
           <span class="token">#{{ g.token ? g.token.slice(0, 8) : 'ACCESS' }}</span>
-          <button v-if="g.used" class="btn-reset-mini" @click="resetGuest(g._id)">Reset</button>
+          <div class="card-actions">
+            <button
+              class="btn-invite-mini"
+              :disabled="busyCard === g._id"
+              @click="downloadInvitation(g)"
+            >
+              {{ busyCard === g._id ? "…" : "Invitation" }}
+            </button>
+            <button v-if="g.used" class="btn-reset-mini" @click="resetGuest(g._id)">Reset</button>
+          </div>
         </div>
       </div>
     </transition-group>
@@ -146,14 +166,19 @@ import { useRouter } from "vue-router";
 import api from "../services/api";
 import QRCode from "qrcode";
 import { clearStaffKey } from "../services/auth";
-
-import { FRONTEND_BASE_URL } from "../config";
+import { passQrDataUrl, passUrl } from "../services/passQr";
+import { composePassImage } from "../services/passImage";
+import { createZip } from "../services/zip";
 
 const router = useRouter();
 
 const isCreating = ref(false);
 const isLoading = ref(false);
 const authError = ref("");
+
+/** which pass card is currently rendering its invitation */
+const busyCard = ref("");
+const bulk = ref({ running: false, done: 0, total: 0 });
 
 /** A 401 means the stored staff key is gone or wrong: sign back in */
 const handleError = (e) => {
@@ -271,10 +296,90 @@ const downloadZip = async () => {
   }
 };
 
+/** Downloads a blob under a given filename */
+const saveBlob = (blob, filename) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+};
+
+const cardFileName = (guest, extension) => {
+  const number = String(guest.sequence || "").padStart(4, "0");
+  const who = (guest.name || "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-|-$/g, "");
+
+  return `ChiNet-Invitation-${number}${who ? `-${who}` : ""}.${extension}`;
+};
+
+const invitationFor = async (guest, type = "image/png") =>
+  composePassImage({
+    qrDataUrl: await passQrDataUrl(guest.token),
+    name: guest.name || "",
+    org: [guest.company, guest.role].filter(Boolean).join(" · "),
+    ticketType: guest.ticketType,
+    reference: `Pass #${String(guest.sequence || "").padStart(4, "0")}`,
+    variant: "invitation",
+    type,
+  });
+
+/** One digital invitation, for sending to a specific guest */
+const downloadInvitation = async (guest) => {
+  if (busyCard.value) return;
+
+  busyCard.value = guest._id;
+
+  try {
+    saveBlob(await invitationFor(guest), cardFileName(guest, "png"));
+  } catch (e) {
+    authError.value = "Could not build that invitation card. Please try again.";
+  } finally {
+    busyCard.value = "";
+  }
+};
+
+/**
+ * Every invitation as one ZIP. Cards are JPEG here: at ~800 KB per PNG a few
+ * hundred guests would be an archive too large for a browser to hold.
+ */
+const downloadAllInvitations = async () => {
+  if (bulk.value.running || !guests.value.length) return;
+
+  bulk.value = { running: true, done: 0, total: guests.value.length };
+  authError.value = "";
+
+  try {
+    const files = [];
+
+    for (const guest of guests.value) {
+      const blob = await invitationFor(guest, "image/jpeg");
+
+      files.push({
+        name: cardFileName(guest, "jpg"),
+        data: new Uint8Array(await blob.arrayBuffer()),
+      });
+
+      bulk.value = { ...bulk.value, done: files.length };
+    }
+
+    saveBlob(createZip(files), "ChiNet-Launch-Digital-Invitations.zip");
+  } catch (e) {
+    authError.value = "Could not build the invitation archive. Please try again.";
+  } finally {
+    bulk.value = { running: false, done: 0, total: 0 };
+  }
+};
+
 const drawQR = (canvas, token) => {
   if (!canvas) return;
 
-  QRCode.toCanvas(canvas, `${FRONTEND_BASE_URL}/guests/verify/${token}`, {
+  QRCode.toCanvas(canvas, passUrl(token), {
     width: 150,
     margin: 1,
     color: {
@@ -585,6 +690,32 @@ onMounted(load);
   font-size: 11px;
   color: #64748B;
   font-family: monospace;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-invite-mini {
+  background: rgb(var(--tint-rgb) / 0.2);
+  border: 1px solid rgb(var(--tint-rgb) / 0.45);
+  color: var(--primary-pale);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-invite-mini:hover:not(:disabled) {
+  background: rgb(var(--tint-rgb) / 0.34);
+}
+
+.btn-invite-mini:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .btn-reset-mini {

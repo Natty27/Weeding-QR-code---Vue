@@ -33,14 +33,27 @@ const palette = () => ({
   glow: cssVar("--primary-rgb", "0 0 255"),
 });
 
-const loadImage = (src) =>
-  new Promise((resolve, reject) => {
+/** the mark is identical on every card, so it is fetched once per session */
+const imageCache = new Map();
+
+const loadImage = (src) => {
+  const cached = imageCache.get(src);
+
+  if (cached) return cached;
+
+  const pending = new Promise((resolve, reject) => {
     const image = new Image();
 
     image.onload = () => resolve(image);
     image.onerror = () => reject(new Error(`could not load ${src.slice(0, 24)}…`));
     image.src = src;
   });
+
+  // QR codes differ per guest, so only the reusable art is worth keeping
+  if (src.startsWith("data:image/svg+xml")) imageCache.set(src, pending);
+
+  return pending;
+};
 
 const roundRect = (ctx, x, y, w, h, r) => {
   if (typeof ctx.roundRect === "function") {
@@ -84,12 +97,26 @@ const centreText = (ctx, text, y, { font, color, spacing = 0 }) => {
 /**
  * @param {object} pass
  * @param {string} pass.qrDataUrl  the QR image already generated for this pass
- * @param {string} pass.name       guest name
+ * @param {string} pass.name       guest name, blank on an unclaimed invitation
  * @param {string} pass.org        "Company · Role", may be empty
  * @param {string} pass.ticketType Standard, VIP, …
- * @returns {Promise<Blob>} PNG of the finished pass
+ * @param {string} [pass.reference] pass number, shown on a blank invitation
+ *        in place of a name so staff can match it to the printed list
+ * @param {"pass"|"invitation"} [pass.variant]  a claimed pass, or an invite to
+ *        register that carries the same QR
+ * @param {"image/png"|"image/jpeg"} [pass.type] PNG single, JPEG in bulk
+ * @returns {Promise<Blob>} the finished card
  */
-export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => {
+export const composePassImage = async ({
+  qrDataUrl,
+  name,
+  org,
+  ticketType,
+  reference = "",
+  variant = "pass",
+  type = "image/png",
+}) => {
+  const invitation = variant === "invitation";
   const canvas = document.createElement("canvas");
 
   canvas.width = W;
@@ -157,7 +184,9 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   y += 40;
 
   // ticket type chip
-  const chip = `${(ticketType || "Standard").toUpperCase()} PASS`;
+  const chip = invitation
+    ? "YOU'RE INVITED"
+    : `${(ticketType || "Standard").toUpperCase()} PASS`;
 
   ctx.font = '700 24px Inter, system-ui, sans-serif';
   const chipWidth = ctx.measureText(chip).width + 44;
@@ -175,12 +204,23 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   });
   y += 46 + 62;
 
-  // who the pass belongs to
-  centreText(ctx, name || "Event Attendee", y, {
-    font: '700 44px Inter, system-ui, sans-serif',
-    color: ink.white,
-  });
-  y += org ? 44 : 22;
+  // who it belongs to; a blank invitation carries its pass number instead
+  const who = name || (invitation ? "" : "Event Attendee");
+
+  if (who) {
+    centreText(ctx, who, y, {
+      font: '700 44px Inter, system-ui, sans-serif',
+      color: ink.white,
+    });
+  } else if (reference) {
+    centreText(ctx, reference, y, {
+      font: '600 30px Inter, system-ui, sans-serif',
+      color: ink.muted,
+      spacing: 2,
+    });
+  }
+
+  y += who && org ? 44 : 22;
 
   if (org) {
     centreText(ctx, org, y, {
@@ -201,11 +241,17 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   y += 58;
 
   // when and where
-  centreText(ctx, `${EVENT.dateLong}  ·  ${EVENT.time}`, y, {
+  centreText(ctx, EVENT.dateLong, y, {
     font: '600 30px Inter, system-ui, sans-serif',
     color: ink.white,
   });
-  y += 44;
+  y += 42;
+
+  centreText(ctx, EVENT.timeBoth, y, {
+    font: '600 27px Inter, system-ui, sans-serif',
+    color: ink.white,
+  });
+  y += 40;
 
   centreText(ctx, EVENT.venueLong, y, {
     font: '400 28px Inter, system-ui, sans-serif',
@@ -235,7 +281,11 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
     panel - inset * 2,
   );
 
-  centreText(ctx, "Present this pass at the gate for check-in", H - PAD - 18, {
+  const footer = invitation
+    ? "Scan this code with your phone to reserve your guest pass"
+    : "Present this pass at the gate for check-in";
+
+  centreText(ctx, footer, H - PAD - 18, {
     font: '400 24px Inter, system-ui, sans-serif',
     color: ink.faint,
   });
@@ -243,7 +293,8 @@ export const composePassImage = async ({ qrDataUrl, name, org, ticketType }) => 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new Error("could not render pass"))),
-      "image/png",
+      type,
+      0.92,
     );
   });
 };
