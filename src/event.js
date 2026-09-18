@@ -14,10 +14,7 @@ export const EVENT = {
    * international clock shown elsewhere on the page - the same moment, not a
    * mistake. Set to null to remove the banner.
    */
-  notice: {
-    lead: "Starts 11:00 Ethiopian time",
-    text: "5:00 PM international — your printed pass is correct.",
-  },
+  notice: "The launch invitation is 11:00 Ethiopian time",
 
   /** short forms for the invitation's date/time/venue strip */
   dayShort: "Sat, Sep 19",

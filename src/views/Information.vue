@@ -10,9 +10,7 @@
         <!-- start-time note, shown while EVENT.notice is set -->
         <div v-if="EVENT.notice" class="alert" role="status">
           <AppIcon name="clock" :size="15" />
-          <p>
-            <strong>{{ EVENT.notice.lead }}</strong> · {{ EVENT.notice.text }}
-          </p>
+          <p>{{ EVENT.notice }}</p>
         </div>
 
         <header class="brand">
@@ -391,12 +389,9 @@ const submit = async () => {
 
 .alert p {
   margin: 0;
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 600;
   line-height: 1.4;
-}
-
-.alert strong {
-  font-weight: 700;
   color: #fde68a;
 }
 
