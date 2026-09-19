@@ -3,6 +3,7 @@ import Admin from "@/views/Admin.vue";
 import Verify from "@/views/Verify.vue";
 import Information from "@/views/Information.vue";
 import Login from "@/views/Login.vue";
+import Attendance from "@/views/Attendance.vue";
 import { isStaff } from "@/services/auth";
 
 const routes = [
@@ -32,6 +33,11 @@ const routes = [
     path: "/verify/:token",
     name: "Verify",
     component: Verify,
+  },
+  {
+    path: "/attendance",
+    name: "Attendance",
+    component: Attendance,
   },
   {
     path: "/information",
